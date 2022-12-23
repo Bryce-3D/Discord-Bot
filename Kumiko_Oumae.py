@@ -88,12 +88,14 @@ async def imo(ctx, country = None):
 
 
 @bot.command()
-async def spam(ctx, n = 20):
+async def spam(ctx, n = 5):
     '''h a'''
     msges = ['OMG IT\'S A SUSSY AMOGUS BAKA-CHAN', 
              'I\'ve been mixing my own urine, various perfumes and chemicals to make the perfect emulatuon of Hoshimachi Suisei\'s urine scent.', 
              'Genshin Impact is a game which has sucked away my soul and killed my dog.', 
-             'Gura my dog died ***LET\'S GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO***']
+             'Gura my dog died ***LET\'S GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO***',
+             'Meto mis juevos en tu *boca*',
+             'Genshin Impact is a game which has sucked away my soul and killed my dog']
     l = len(msges)
 
     #Prevent over-abuse
@@ -105,10 +107,47 @@ async def spam(ctx, n = 20):
             msg += random.choice(msges)
             msg += '\n'
         await ctx.send(msg)
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(3)
         
 
+@bot.command()
+async def meta(ctx):
+    '''Meto mis juevos en tu boca'''
+    msges = ['I have one question to ask slayer.',
+             'What\'s the name of the VR company owned by the lizard man?',
+             'It\'s Meta hellboy',
+             'METO MIS JUEVOS EN TU ***BOCA***']
+    
+    for msg in msges:
+        await ctx.send(msg)
+        await asyncio.sleep(5)
 
+
+
+#ha[i][j] = the ith ha capitalization nested between j pairs of asterisks
+ha = [['ha','hA','Ha','HA']]
+for i in range(3):
+    ha.append(['*' + i + '*' for i in ha[-1]])
+arr = ['↗️', '↘️']
+
+@bot.command()
+async def pekopeko(ctx, min_ha, max_ha):
+    '''
+    Channel your inner peko laugh. 
+    Number of ha's is in the range [min_ha:max_ha]
+    Taken from my repository Random
+    '''
+    min_ha, max_ha = int(min_ha), int(max_ha)
+    n = random.randrange(min_ha, max_ha)
+    s = []
+
+    #Randomly put together the selected number of ha's
+    for i in range(n):
+        s.append( random.choice(random.choice(ha)) )
+        s.append( random.choice(arr) )
+
+    s = ' '.join(s)
+    await ctx.send(s)
 
 
 
@@ -169,4 +208,5 @@ async def on_ready():
 #     """Is the bot cool?"""
 #     await ctx.send('Yes, the bot is cool.')
 
+#Token redacted for obvious reasons
 bot.run()

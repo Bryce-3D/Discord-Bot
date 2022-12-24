@@ -8,9 +8,7 @@ import random
 #For async sleeping
 import asyncio
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+description = '''I'm a bot, I guess'''
 
 intents = discord.Intents.default()
 intents.members = True
@@ -131,14 +129,48 @@ for i in range(3):
 arr = ['↗️', '↘️']
 
 @bot.command()
-async def pekopeko(ctx, min_ha, max_ha):
+async def pekopeko(ctx, min_ha = None, max_ha = None):
     '''
     Channel your inner peko laugh. 
-    Number of ha's is in the range [min_ha:max_ha]
+    Number of ha's is 
+        default = randomly chosen in [10:30]
+        one arg = that arg
+        two args = range(arg0, arg1)
     Taken from my repository Random
     '''
-    min_ha, max_ha = int(min_ha), int(max_ha)
-    n = random.randrange(min_ha, max_ha)
+    if min_ha == None:
+        n = random.randrange(10,30)
+    elif max_ha == None:
+        #Verify that the input is actually valid
+        if not min_ha.isdigit():
+            await ctx.send(f'Integer inputs pls')
+            return
+        
+        n = int(min_ha)
+        if n <= 0:
+            await ctx.send(f'{n} isn\'t a positive integer...')
+            return
+    else:
+        #Verify that the inputs are actually valid
+        if not (min_ha.isdigit() and max_ha.isidigit()):
+            await ctx.send(f'Integer inputs pls')
+        
+        m,M = int(min_ha), int(max_ha)
+        if m <= 0 and M <= 0:
+            await ctx.send(f'{m} and {M} aren\'t positive integers...')
+            return
+        elif m <= 0:
+            await ctx.send(f'{m} isn\'t a positive integer...')
+            return
+        elif M <= 0:
+            await ctx.send(f'{M} isn\'t a positive integer...')
+            return
+        elif m >= M:
+            await ctx.send(f'[{m},{M}) isn\'t a valid interval...')
+            return
+
+
+        n = random.randrange(m, M)
     s = []
 
     #Randomly put together the selected number of ha's
@@ -160,7 +192,7 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
-    print('------')
+    print('~' * 75)
 
 # @bot.command()
 # async def add(ctx, left: int, right: int):

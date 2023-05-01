@@ -3,12 +3,15 @@
 import discord
 from discord.ext import commands
 
-from Token import token
-
 #For rng purposes
 import random
 #For async sleeping
 import asyncio
+#For Optional type hinting
+from typing import Optional
+#For the bot token
+from Token import token
+
 
 description = '''I'm a bot, I guess'''
 
@@ -31,9 +34,12 @@ num_to_keycap = {0:'0️⃣', 1:'1️⃣', 2:'2️⃣', 3:'3️⃣', 4:'4️⃣'
                  5:'5️⃣', 6:'6️⃣', 7:'7️⃣', 8:'8️⃣', 9:'9️⃣', 10:'🔟'}
 
 
-#Bot commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#                           Bot commands
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @bot.command()
-async def nusmods(ctx, module_code = None):
+async def nusmods(ctx:commands.Context, module_code:str=None) -> None:
     '''Returns the link to a given module in nusmods if a valid module code is given.
     Otherwise, returns a link to the module search page of nusmods.'''
     if module_code == None:
@@ -44,35 +50,35 @@ async def nusmods(ctx, module_code = None):
 
 
 @bot.command()
-async def suipiss(ctx):
+async def suipiss(ctx:commands.Context) -> None:
     '''suipiss'''
     await ctx.send('https://www.youtube.com/watch?v=mayWtLidGlA')
 
 
 
 @bot.command()
-async def choose(ctx, *items):
+async def choose(ctx:commands.Context, *items:list[str]) -> None:
     '''Prints a random item from a list of items'''
     await ctx.send(random.choice(items))
 
 
 
 @bot.command()
-async def poll(ctx, question, *choices):
+async def poll(ctx:commands.Context, question:str, *choices:list[str]) -> None:
     '''Creates a poll with a question and a (possibly null) set of choices'''
     msg_text = question
 
     #If no choices given
     if len(choices) == 0:
-        msg = await ctx.send(msg_text)   #Send the msg
-
+        msg = await ctx.send(msg_text)
         await msg.add_reaction('<:ya:1102451988005929021>')
         await msg.add_reaction('<:meh:1102451982750457996>')
         await msg.add_reaction('<:na:1102451985954902036>')
     
     #If choices are given
     else:
-        if len(choices) > 10:   #If too many choices
+        #If too many choices, tell them to put less
+        if len(choices) > 10:
             await ctx.send('Pls put at most 10 options')
         else:   #If not too many choices
             #Add the choices to the msg
@@ -89,7 +95,7 @@ async def poll(ctx, question, *choices):
 
 
 @bot.command()
-async def imo(ctx, country = None):
+async def imo(ctx:commands.Context, country:str=None) -> None:
     '''Search the IMO stats of a country'''
     if country == None:
         await ctx.send('https://www.imo-official.org/default.aspx')
@@ -99,7 +105,7 @@ async def imo(ctx, country = None):
 
 
 @bot.command()
-async def spam(ctx, n = 5):
+async def spam(ctx:commands.Context, n:int=5) -> None:
     '''h a'''
     msges = ['OMG IT\'S A SUSSY AMOGUS BAKA-CHAN', 
              'I\'ve been mixing my own urine, various perfumes and chemicals to make the perfect emulatuon of Hoshimachi Suisei\'s urine scent.', 
@@ -122,8 +128,9 @@ async def spam(ctx, n = 5):
         await asyncio.sleep(3)
         
 
+
 @bot.command()
-async def meta(ctx):
+async def meta(ctx:commands.Context) -> None:
     '''Meto mis juevos en tu boca'''
     msges = ['I have one question to ask slayer.',
              'What\'s the name of the VR company owned by the lizard man?',
@@ -143,7 +150,7 @@ for i in range(3):
 arr = ['↗️', '↘️']
 
 @bot.command()
-async def pekopeko(ctx, min_ha = None, max_ha = None):
+async def pekopeko(ctx:commands.Context, min_ha:Optional[int]=None, max_ha:Optional[int]=None) -> None:
     '''
     Channel your inner peko laugh. 
     Number of ha's is 
@@ -152,24 +159,16 @@ async def pekopeko(ctx, min_ha = None, max_ha = None):
         two args = range(arg0, arg1)
     Taken from my repository Random
     '''
+    #Determine number of laughs to put
     if min_ha == None:
         n = random.randrange(10,30)
     elif max_ha == None:
-        #Verify that the input is actually valid
-        if not min_ha.isdigit():
-            await ctx.send(f'Integer inputs pls')
-            return
-        
-        n = int(min_ha)
+        n = min_ha
         if n <= 0:
             await ctx.send(f'{n} isn\'t a positive integer...')
             return
     else:
-        #Verify that the inputs are actually valid
-        if not (min_ha.isdigit() and max_ha.isidigit()):
-            await ctx.send(f'Integer inputs pls')
-        
-        m,M = int(min_ha), int(max_ha)
+        m,M = min_ha,max_ha
         if m <= 0 and M <= 0:
             await ctx.send(f'{m} and {M} aren\'t positive integers...')
             return
@@ -182,21 +181,21 @@ async def pekopeko(ctx, min_ha = None, max_ha = None):
         elif m >= M:
             await ctx.send(f'[{m},{M}) isn\'t a valid interval...')
             return
-
-
         n = random.randrange(m, M)
-    s = []
-
+    
     #Nerf to make sure it fits in one message
     n = min(n,200)
+    s = []
 
     #Randomly put together the selected number of ha's
-    for i in range(n):
+    for Homu in range(n):
         s.append( random.choice(random.choice(ha)) )
         s.append( random.choice(arr) )
 
     s = ' '.join(s)
     await ctx.send(s)
+
+
 
 
 
@@ -210,6 +209,8 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('~' * 75)
+
+bot.run(token)
 
 # @bot.command()
 # async def add(ctx, left: int, right: int):
@@ -256,5 +257,3 @@ async def on_ready():
 # async def _bot(ctx):
 #     """Is the bot cool?"""
 #     await ctx.send('Yes, the bot is cool.')
-
-bot.run(token)

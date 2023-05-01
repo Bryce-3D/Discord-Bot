@@ -3,6 +3,8 @@
 import discord
 from discord.ext import commands
 
+from Token import token
+
 #For rng purposes
 import random
 #For async sleeping
@@ -10,10 +12,14 @@ import asyncio
 
 description = '''I'm a bot, I guess'''
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 
 bot = commands.Bot(command_prefix='%', description=description, intents=intents)
+
+#https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh
+#https://stackoverflow.com/questions/71959420/client-init-missing-1-required-keyword-only-argument-intents
+client = discord.Client(intents=discord.Intents.default())
 
 
 #Utilities ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,9 +62,16 @@ async def poll(ctx, question, *choices):
     '''Creates a poll with a question and a (possibly null) set of choices'''
     msg_text = question
 
-    if len(choices) == 0:   #If no choices given
-        await ctx.send(msg_text)
-    else:                   #If choices are given
+    #If no choices given
+    if len(choices) == 0:
+        msg = await ctx.send(msg_text)   #Send the msg
+
+        await msg.add_reaction('<:ya:1102451988005929021>')
+        await msg.add_reaction('<:meh:1102451982750457996>')
+        await msg.add_reaction('<:na:1102451985954902036>')
+    
+    #If choices are given
+    else:
         if len(choices) > 10:   #If too many choices
             await ctx.send('Pls put at most 10 options')
         else:   #If not too many choices
@@ -93,7 +106,8 @@ async def spam(ctx, n = 5):
              'Genshin Impact is a game which has sucked away my soul and killed my dog.', 
              'Gura my dog died ***LET\'S GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO***',
              'Meto mis juevos en tu *boca*',
-             'Genshin Impact is a game which has sucked away my soul and killed my dog']
+             'Genshin Impact is a game which has sucked away my soul and killed my dog',
+             'L + Ratio']
     l = len(msges)
 
     #Prevent over-abuse
@@ -173,6 +187,9 @@ async def pekopeko(ctx, min_ha = None, max_ha = None):
         n = random.randrange(m, M)
     s = []
 
+    #Nerf to make sure it fits in one message
+    n = min(n,200)
+
     #Randomly put together the selected number of ha's
     for i in range(n):
         s.append( random.choice(random.choice(ha)) )
@@ -240,5 +257,4 @@ async def on_ready():
 #     """Is the bot cool?"""
 #     await ctx.send('Yes, the bot is cool.')
 
-#Token redacted for obvious reasons
-bot.run()
+bot.run(token)

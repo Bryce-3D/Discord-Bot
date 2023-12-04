@@ -57,14 +57,14 @@ async def suipiss(ctx:commands.Context) -> None:
 
 
 @bot.command()
-async def choose(ctx:commands.Context, *items:list[str]) -> None:
+async def choose(ctx:commands.Context, *items:str) -> None:
     '''Prints a random item from a list of items'''
     await ctx.send(random.choice(items))
 
 
 
 @bot.command()
-async def poll(ctx:commands.Context, question:str, *choices:list[str]) -> None:
+async def poll(ctx:commands.Context, question:str, *choices:str) -> None:
     '''Creates a poll with a question and a (possibly null) set of choices'''
     msg_text = question
 

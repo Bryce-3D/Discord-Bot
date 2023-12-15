@@ -2,6 +2,7 @@
 - Reminders (Like Kitchen Sink bot)
 - YouTube search
 - MAL search
+- NUSMods check
 
 ### Games
 - Tic Tac Toe

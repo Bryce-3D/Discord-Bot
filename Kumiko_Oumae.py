@@ -9,6 +9,11 @@ import random
 import asyncio
 #For Optional type hinting
 from typing import Optional
+#For JSON processing
+import json
+#For NUSMods API
+from requests import get as URLGet
+
 #For the bot token
 from Token import token
 

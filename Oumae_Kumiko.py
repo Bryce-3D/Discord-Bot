@@ -12,7 +12,9 @@ from typing import Optional
 #For JSON processing
 import json
 #For NUSMods API
-from requests import get as URLGet
+from requests import get as get_url
+#For getting the time
+from datetime import datetime as dt
 
 #For the bot token
 from Token import token
@@ -44,13 +46,115 @@ num_to_keycap = {0:'0️⃣', 1:'1️⃣', 2:'2️⃣', 3:'3️⃣', 4:'4️⃣'
 #                           Bot commands
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @bot.command()
-async def nusmods(ctx:commands.Context, module_code:str=None) -> None:
-    '''Returns the link to a given module in nusmods if a valid module code is given.
-    Otherwise, returns a link to the module search page of nusmods.'''
-    if module_code == None:
-        await ctx.send('https://nusmods.com/modules/')
-    else:
-        await ctx.send('https://nusmods.com/modules/' + module_code.upper())
+async def nusmods(ctx:commands.Context, mod_code:str=None, AY:str=None) -> None:
+    '''
+    TODO: Update the info here
+    TODO: Also make the documentation here for programmers and create a 
+          custom help page.
+    
+    Returns the link to a given module in nusmods if a valid module code is given.
+    Otherwise, returns a link to the module search page of nusmods.
+    '''
+
+    def append_sample(s:str) -> str:
+        '''Appends a sample usage of this command to a string `s`'''
+        s += '\n'
+        s += 'Command Usage:\n'
+        s += '`%nusmods mod_code AY`\n'
+        s += 'Examples:\n'
+        s += '`%nusmods LAJ1201`\n'
+        s += '`%nusmods CS2040S 2021-2022`\n'
+        s += '*If the AY is not provided, the current AY is used by default'
+        return s
+    
+    def is_valid_ay(s:str) -> bool:
+        '''Checks whether `s` is a valid input for AY'''
+        #Check that it is XXXX-XXXX
+        if len(s) != 9:
+            return False
+        if s[4] != '-':
+            return False
+
+        #Check that the other characters are normal digits
+        digs = [str(i) for i in range(10)]
+        for c in s[:4]:
+            if c not in digs:
+                return False
+        for c in s[5:]:
+            if c not in digs:
+                return False
+        
+        #Check that the years are consecutive in order
+        y0 = int(s[:4])
+        y1 = int(s[5:])
+        if y1-y0 != 1:
+            return False
+
+        return True
+    
+    def is_future_ay(s:str) -> bool:
+        '''
+        Given a valid AY string `s`, checks whether 
+        this is a future AY or not
+        '''
+        y0 = int(s[:4])      #1nd year of the AY
+        y = dt.now().year    #Current year
+        m = dt.now().month   #Current month
+        if y0 > y:           #Year too far in the future
+            return True
+        if y0 == y and m <= 6:   #Possible but too early in the year
+            return True
+        return False
+
+    def curr_ay() -> str:
+        '''Generates the AY string for the current AY'''
+        now = dt.now()
+        y = now.year    #y = int(now.strftime('%Y'))
+        m = now.month   #m = int(now.strftime('%m'))
+        if m <= 6:
+            return f'{y-1}-{y}'
+        else:
+            return f'{y}-{y+1}'
+
+    if mod_code == None:
+        s  = 'NUSMods is a useful website for looking up timetables '
+        s += 'and information regarding classes in NUS.\n'
+        s += 'https://nusmods.com/modules/\n'
+        s += 'Please enter a module code to look up information for it.'
+        s += '\n'
+        s  = append_sample(s)
+        await ctx.send(s)
+        return
+
+    #Uppercase mod_code and default to current AY if none given
+    mod_code = mod_code.upper()
+    if AY == None:
+        AY = curr_ay()
+
+    #Check that the inputted AY is valid
+    if not is_valid_ay(AY):
+        s  = 'Invalid `AY` format, pls type as'
+        s += '`XXXX-YYYY` where `YYYY = XXXX+1`.\n'
+        s += 'Use `%nusmods` for some sample usages.'
+        await ctx.send(s)
+        return
+    
+    #Check that the inputted AY is not in the future
+    if is_future_ay(AY):
+        s  = 'Sorry, that `AY` is in the future. I cannot predict the future.'
+        await ctx.send(s)
+        return
+    
+    #Try retrieving info through the NUSMods API
+    API = 'https://api.nusmods.com/v2'
+    r = get_url(f'{API}/{AY}/modules/{mod_code}.json')
+    if r.status_code == 404:
+        s = 'Error 404 received, pls double check that this module exists'
+        await ctx.send(s)
+        return
+    
+    await ctx.send('In Progress')
+
 
 
 

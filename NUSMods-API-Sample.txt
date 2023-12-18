@@ -1,0 +1,301 @@
+{
+
+'acadYear': '2023/2024', 
+
+'description': 'This course aims to prepare students in competitive problem solving. It covers techniques for attacking and solving challenging computational problems. Fundamental algorithmic solving techniques covered include divide and conquer, greedy, dynamic programming, backtracking and branch and bound. Domain specific techniques like number theory, computational geometry, string processing and graph theoretic will also be covered. Advanced AI search techniques like iterative deepening, A* and heuristic search will be included. The course also covers algorithmic and programming language toolkits used in problem solving supported by the solution of representative or well-known problems in the various algorithmic paradigms.', 
+
+'title': 'Competitive Programming', 
+
+'additionalInformation': '', 
+
+'department': 'Computer Science', 
+
+'faculty': 'Computing', 
+
+'workload': [2, 1, 0, 3, 3], 
+
+'gradingBasisDescription': 'Graded', 
+
+'prerequisite': 'if undertaking an Undergraduate Degree then ( ( must have completed 1 of CS2030/CS2030S at a grade of at least A- and must have completed 1 of CS2040/CS2040C/CS2040S at a grade of at least A- ) or ( must have completed 1 of "CS2010"/"CS2020" at a grade of at least A- ) )', 
+
+'prerequisiteRule': 'PROGRAM_TYPES IF_IN Undergraduate Degree THEN ((COURSES (1) CS2030S:A-, CS2030:A- AND COURSES (1) CS2040S:A-, CS2040:A-, CS2040C:A-) OR (COURSES (1) CS2010:A-, CS2020:A-))', 
+
+'moduleCredit': '4', 
+
+'moduleCode': 'CS3233', 
+
+'semesterData': [
+    {
+        'semester': 2, 
+        'timetable': [
+            {'classNo': '1', 
+            'startTime': '1700', 
+            'endTime': '2200', 
+            'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+            'venue': 'COM1-B109', 
+            'day': 'Monday', 
+            'lessonType': 'Lecture', 
+            'size': 40, 
+            'covidZone': 'C'}
+        ], 
+        'covidZones': ['C']
+    }
+], 
+
+'prereqTree': {
+    'or': [
+        {'and': [
+            {'or': ['CS2030S:A-', 'CS2030:A-']}, 
+            {'or': ['CS2040S:A-', 'CS2040:A-', 'CS2040C:A-']}
+        ]}, 
+        'CS2010:A-', 
+        'CS2020:A-'
+    ]
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+{
+    'acadYear': '2023/2024', 
+    
+    'preclusion': 'If undertaking an Undergraduate Degree THEN ( must not have completed 1 of BT4221/CS5425 at a grade of at least D)', 'preclusionRule': 'PROGRAM_TYPES IF_IN Undergraduate Degree THEN (COURSES (1) CS5425:D, BT4221:D)', 
+    
+    'description': 'Data science incorporates varying elements and builds on techniques and theories from many fields, including statistics, data engineering, data mining, visualization, data warehousing, and high-performance computing systems with the goal of extracting meaning from big data and creating data products. Data science utilizes advanced computing systems such as Apache Hadoop and Spark to address big data challenges. In this course, students will learn various computing systems and optimization techniques that are used in data science with emphasis on the system building and algorithmic optimizations of these techniques.', 
+    
+    'title': 'Big Data Systems for Data Science', 
+    
+    'additionalInformation': '', 
+    
+    'department': 'Computer Science', 
+    
+    'faculty': 'Computing', 
+    
+    'workload': [2, 1, 0, 0, 4], 
+    
+    'gradingBasisDescription': 'Graded', 
+    
+    'prerequisite': 'If undertaking an Undergraduate Degree THEN ( must have completed 1 of CS2102/IT2002 at a grade of at least D)', 
+    
+    'prerequisiteRule': 'PROGRAM_TYPES IF_IN Undergraduate Degree THEN (COURSES (1) CS2102:D, IT2002:D)', 
+    
+    'moduleCredit': '4', 
+    
+    'moduleCode': 'CS4225', 
+    
+    'attributes': {
+        'lab': True, 
+        'mpes1': True, 
+        'mpes2': True
+    }, 
+    
+    'aliases': ['CS5425'], 
+    
+    'semesterData': [
+        {
+            'semester': 1, 
+            'timetable': [
+                {
+                    'classNo': '1', 
+                    'startTime': '2030', 
+                    'endTime': '2130', 
+                    'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+                    'venue': 'LT11', 
+                    'day': 'Friday', 
+                    'lessonType': 'Tutorial', 
+                    'size': 340, 
+                    'covidZone': 'C'
+                }, 
+                {
+                    'classNo': '1', 
+                    'startTime': '1830', 
+                    'endTime': '2030', 
+                    'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+                    'venue': 'LT11', 
+                    'day': 'Friday', 
+                    'lessonType': 'Lecture', 
+                    'size': 340, 
+                    'covidZone': 'C'
+                }
+            ], 
+            'covidZones': ['C'], 
+            'examDate': '2023-11-29T05:00:00.000Z', 
+            'examDuration': 120
+        }, 
+        {
+            'semester': 2, 
+            'timetable': [
+                {
+                    'classNo': '1', 
+                    'startTime': '1830', 
+                    'endTime': '2030', 
+                    'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+                    'venue': 'LT11', 
+                    'day': 'Thursday', 
+                    'lessonType': 'Lecture', 
+                    'size': 320, 
+                    'covidZone': 'C'
+                }, 
+                {
+                    'classNo': '1', 
+                    'startTime': '2030', 
+                    'endTime': '2130', 
+                    'weeks': [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+                    'venue': 'LT11', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 320, 'covidZone': 'C'}], 'covidZones': ['C'], 'examDate': '2024-04-29T09:00:00.000Z', 'examDuration': 120}], 'prereqTree': {'or': ['CS2102:D', 'IT2002:D']}, 'fulfillRequirements': ['CS6282', 'CS3281', 'CS3282']}
+
+
+
+
+
+
+
+
+
+
+
+
+{
+    'acadYear': '2023/2024', 
+    
+    'preclusion': 'If undertaking an Undergraduate Degree THEN ( must not have completed 1 of CS1010/CS1010A/CS1010J/CS1010S/CS1010X/CS1101S at a grade of at least D)', 
+    
+    'preclusionRule': 'PROGRAM_TYPES IF_IN Undergraduate Degree THEN (COURSES (1) CS1010J:D, CS1010:D, CS1010S:D, CS1010X:D, CS1101S:D, CS1010A:D)', 
+    
+    'description': 'This course introduces the fundamental concepts of problem solving by computing and programming using an imperative programming language. It is the first and foremost introductory course to computing. Topics covered include computational thinking and computational problem solving, designing and specifying an algorithm, basic problem formulation and problem solving approaches, program development, coding, testing and debugging, fundamental programming constructs (variables, types, expressions, assignments, functions, control structures, etc.), fundamental data structures (arrays, strings, composite data types), basic sorting, and recursion.', 
+    
+    'title': 'Programming Methodology', 
+    
+    'additionalInformation': '', 
+    
+    'department': 'Computer Science', 
+    
+    'faculty': 'Computing', 
+    
+    'workload': [2, 1, 1, 3, 3], 
+    
+    'gradingBasisDescription': 'Graded', 
+    
+    'moduleCredit': '4', 
+    
+    'moduleCode': 'CS1010E', 
+    
+    'attributes': {
+        'mpes1': True, 
+        'mpes2': True, 
+        'su': True
+    }, 
+    
+    'semesterData': [
+        {
+            'semester': 1, 
+            'timetable': [
+                {
+                    'classNo': '18', 
+                    'startTime': '1200', 
+                    'endTime': '1400', 
+                    'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 
+                    'venue': 'E3-06-03', 
+                    'day': 'Thursday', 
+                    'lessonType': 'Tutorial', 
+                    'size': 25, 
+                    'covidZone': 
+                    'C'
+                }, 
+                {'classNo': '19', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E5-03-22', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '20', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E5-02-32', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '12', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-12', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '16', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'EA-06-05', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '17', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E5-03-22', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '05', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-10', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '06', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-13', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '07', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '11', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '27', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-11', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '23', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E5-02-32', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '24', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-13', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '25', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '36', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'COM1-0204', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '26', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-10', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '1', 'startTime': '1600', 'endTime': '1800', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'UT-AUD1', 'day': 'Monday', 'lessonType': 'Sectional Teaching', 'size': 410, 'covidZone': 'C'}, 
+                {'classNo': '38', 'startTime': '1200', 'endTime': '1400', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-12', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '2', 'startTime': '1600', 'endTime': '1800', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'UT-AUD1', 'day': 'Tuesday', 'lessonType': 'Sectional Teaching', 'size': 410, 'covidZone': 'C'}, 
+                {'classNo': '02', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '01', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-13', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '03', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-10', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '13', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-13', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '15', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-10', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '29', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'EA-06-06', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '32', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-05', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '34', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-11', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '35', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-03', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '10', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-13', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '33', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E5-03-22', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '22', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-05', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '08', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-03', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '30', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-03', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '37', 'startTime': '1000', 'endTime': '1200', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-12', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '21', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '31', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-11', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '09', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-12', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '28', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-05', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '14', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}, 
+                {'classNo': '04', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-11', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 25, 'covidZone': 'C'}
+            ], 
+            'covidZones': ['C'], 
+            'examDate': '2023-11-27T01:00:00.000Z', 
+            'examDuration': 120
+        }, 
+        {
+            'semester': 2, 
+            'timetable': [
+                {'classNo': '19', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '15', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-10', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '21', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '01', 'startTime': '0800', 'endTime': '1000', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '09', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-10', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '10', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '36', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-06', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '37', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-02', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '2', 'startTime': '1400', 'endTime': '1600', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E-Learn_C', 'day': 'Monday', 'lessonType': 'Sectional Teaching', 'size': 850, 'covidZone': 'Unknown'}, 
+                {'classNo': '1', 'startTime': '1400', 'endTime': '1600', 'weeks': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'UT-AUD1', 'day': 'Monday', 'lessonType': 'Sectional Teaching', 'size': 850, 'covidZone': 'C'}, 
+                {'classNo': '16', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '02', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-08', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '39', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-06', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '27', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '33', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-04', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '34', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-03', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '35', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E3-06-05', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '17', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-02', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '11', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-15', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '12', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-08', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '22', 'startTime': '1600', 'endTime': '1800', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-08', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '03', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-09', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '04', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-06', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '26', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-15', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '25', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-15', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '38', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-06', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '13', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-14', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '14', 'startTime': '1200', 'endTime': '1400', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-15', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '28', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-09', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '18', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-08', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '29', 'startTime': '1000', 'endTime': '1200', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-04', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}, 
+                {'classNo': '20', 'startTime': '1400', 'endTime': '1600', 'weeks': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'venue': 'E1-06-09', 'day': 'Friday', 'lessonType': 'Tutorial', 'size': 20, 'covidZone': 'C'}
+            ], 
+            'covidZones': ['C', 'Unknown'], 
+            'examDate': '2024-05-02T05:00:00.000Z', 
+            'examDuration': 120
+        }, 
+        {
+            'semester': 4, 'timetable': [{'classNo': '05', 'startTime': '1600', 'endTime': '1800', 'weeks': {'start': '2024-06-27', 'end': '2024-08-01'}, 'venue': 'COM1-B109', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '01', 'startTime': '1000', 'endTime': '1200', 'weeks': {'start': '2024-06-27', 'end': '2024-08-01'}, 'venue': 'COM1-B112', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '04', 'startTime': '1400', 'endTime': '1600', 'weeks': {'start': '2024-06-26', 'end': '2024-07-31'}, 'venue': 'COM1-B112', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '02', 'startTime': '1200', 'endTime': '1400', 'weeks': {'start': '2024-06-27', 'end': '2024-08-01'}, 'venue': 'COM1-B109', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '04', 'startTime': '1400', 'endTime': '1600', 'weeks': {'start': '2024-06-27', 'end': '2024-08-01'}, 'venue': 'COM1-B112', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '03', 'startTime': '1400', 'endTime': '1600', 'weeks': {'start': '2024-06-26', 'end': '2024-07-31'}, 'venue': 'COM1-B108', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '1', 'startTime': '1000', 'endTime': '1200', 'weeks': {'start': '2024-06-25', 'end': '2024-07-30'}, 'venue': 'LT19', 'day': 'Tuesday', 'lessonType': 'Sectional Teaching', 'size': 100, 'covidZone': 'C'}, {'classNo': '03', 'startTime': '1400', 'endTime': '1600', 'weeks': {'start': '2024-06-27', 'end': '2024-08-01'}, 'venue': 'COM1-B108', 'day': 'Thursday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '02', 'startTime': '1200', 'endTime': '1400', 'weeks': {'start': '2024-06-26', 'end': '2024-07-31'}, 'venue': 'COM1-B109', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '05', 'startTime': '1600', 'endTime': '1800', 'weeks': {'start': '2024-06-26', 'end': '2024-07-31'}, 'venue': 'COM1-B109', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}, {'classNo': '1', 'startTime': '1000', 'endTime': '1200', 'weeks': {'start': '2024-06-24', 'end': '2024-07-29'}, 'venue': 'LT19', 'day': 'Monday', 'lessonType': 'Sectional Teaching', 'size': 100, 'covidZone': 'C'}, {'classNo': '01', 'startTime': '1000', 'endTime': '1200', 'weeks': {'start': '2024-06-26', 'end': '2024-07-31'}, 'venue': 'COM1-B112', 'day': 'Wednesday', 'lessonType': 'Tutorial', 'size': 10, 'covidZone': 'C'}], 'covidZones': ['C'], 'examDate': '2024-08-02T01:00:00.000Z', 'examDuration': 120}], 
+    'fulfillRequirements': ['FIN4719', 'CP2106', 'CS2100', 'IT2001', 'IT2002', 'CS2107', 'CS2100R', 'CS2040C', 'CS2040', 'CS2030', 'CS3237', 'IT3011', 'CS2040S', 'CS2030S', 'IS3221', 'IS4241', 'BT4212', 'BT4221', 'BT4222', 'BT2102', 'IT3010', 'BT3017', 'EE5907', 'EE4702', 'EE2024', 'EE2026', 'ESP3201', 'ST3247', 'DSA4199', 'CG1112', 'CG2028']
+}

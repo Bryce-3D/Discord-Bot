@@ -3,6 +3,8 @@
 - YouTube search
 - MAL search
 - NUSMods check
+  - check number of vacancies in a module (luna)
+  - suggestion: %nusmods MA5202 list → list all AYs that it's offered (htns)
 
 ### Games
 - Tic Tac Toe
@@ -12,4 +14,5 @@
 
 ### Misc
 - Max0r quotes
-
+- Fixing code style
+- Eventually finding a way to host this bot

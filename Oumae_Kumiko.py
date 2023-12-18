@@ -25,7 +25,12 @@ description = '''I'm a bot, I guess'''
 intents = discord.Intents.all()
 intents.members = True
 
-bot = commands.Bot(command_prefix='%', description=description, intents=intents)
+bot = commands.Bot(
+    command_prefix='%', 
+    description=description, 
+    intents=intents,
+    help_command=None
+)
 
 #https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh
 #https://stackoverflow.com/questions/71959420/client-init-missing-1-required-keyword-only-argument-intents
@@ -45,6 +50,30 @@ num_to_keycap = {0:'0️⃣', 1:'1️⃣', 2:'2️⃣', 3:'3️⃣', 4:'4️⃣'
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #                           Bot commands
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@bot.command()
+async def help(ctx:commands.Context, cmd:str=None) -> None:
+    '''
+    Usage
+        %help cmd
+    
+    If cmd is not provided, sends a list of all commands with a short description.
+    If cmd is provided, sends a detailed description of how to use %cmd
+    '''
+
+    emb = discord.Embed(
+        title = '**Help**',
+        description = "Hi! My prefix is `%`",
+        color = 0xff6d01
+    )
+    emb.add_field(
+        name   = '__Commands__', 
+        value  = '> TODO',
+        inline = False
+    )
+    await ctx.channel.send(embed=emb)
+
+
+
 @bot.command()
 async def nusmods(ctx:commands.Context, mod_code:str=None, 
                   AY:str=None) -> None:

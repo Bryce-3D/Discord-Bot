@@ -1,4 +1,5 @@
 ### Utility
+- Custom %help command
 - Reminders (Like Kitchen Sink bot)
 - YouTube search
 - MAL search

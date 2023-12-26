@@ -19,18 +19,10 @@ from datetime import datetime as dt
 #For the bot token
 from Token import token
 
+from bot.bot_config import bot
 
-description = '''I'm a bot, I guess'''
+from bot.commands import suipiss
 
-intents = discord.Intents.all()
-intents.members = True
-
-bot = commands.Bot(
-    command_prefix='%', 
-    description=description, 
-    intents=intents,
-    help_command=None
-)
 
 #https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh
 #https://stackoverflow.com/questions/71959420/client-init-missing-1-required-keyword-only-argument-intents
@@ -278,14 +270,6 @@ async def nusmods(ctx:commands.Context, mod_code:str=None,
     )
 
     await ctx.channel.send(embed=emb)
-
-
-
-@bot.command()
-async def suipiss(ctx:commands.Context) -> None:
-    '''suipiss'''
-    await ctx.send('https://www.youtube.com/watch?v=mayWtLidGlA')
-
 
 
 @bot.command()

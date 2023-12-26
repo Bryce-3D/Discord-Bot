@@ -14,7 +14,8 @@ from discord.ext import commands
 #Bot token is stored in a separate file for secrecy
 from Token import token
 from Kumiko.bot_config import bot
-from Kumiko.commands import choose,help,imo,lemon,nusmods,pekopeko,poll,spam,suipiss,test
+from Kumiko.commands import choose,help,imo,lemon,nusmods,pekopeko,poll,spam,suipiss
+from Kumiko import testing
 
 
 #https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh

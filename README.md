@@ -17,7 +17,7 @@ token='<your token here>'
 # Running the Bot
 From the **project root**, run the following.
 ```bash
-python -m bot.main
+python -m Kumiko.main
 ```
 
 

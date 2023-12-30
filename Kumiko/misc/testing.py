@@ -1,6 +1,6 @@
 import discord
 from discord.ext.commands import has_permissions
-from bot_config import bot, commands
+from ..bot_config import bot, commands
 
 
 

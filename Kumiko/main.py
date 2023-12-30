@@ -15,7 +15,7 @@ from discord.ext import commands
 from Token import token
 from Kumiko.bot_config import bot
 from Kumiko.commands import choose,help,imo,lemon,nusmods,pekopeko,poll,spam,suipiss
-from Kumiko import testing
+from Kumiko.misc import testing
 
 
 #https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh

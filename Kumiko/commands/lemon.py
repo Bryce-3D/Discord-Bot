@@ -20,6 +20,14 @@ lemon_wave *= count
 @bot.command()
 async def lemon(ctx:commands.Context, n:int=5) -> None:
     '''🍋 Lemon 🍋'''
+    if n < 0:
+        await ctx.send('?')
+        return
+    
+    if n == 0:
+        await ctx.send('No lemons?')
+        return
+    
     #Prevent over-abuse
     n = min(n,limit)
 

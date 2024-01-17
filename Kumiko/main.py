@@ -24,9 +24,7 @@ client = discord.Client(intents=discord.Intents.default())
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
+    print(f'Running the bot {bot.user.name}')
     print('~' * 75)
 
 bot.run(token)

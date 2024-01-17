@@ -1,0 +1,5 @@
+fly.io
+https://fly.io/docs/
+
+azure
+https://azure.microsoft.com/en-us

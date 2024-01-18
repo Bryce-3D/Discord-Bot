@@ -16,4 +16,3 @@
 ### Misc
 - Max0r quotes
 - Fixing code style
-- Eventually finding a way to host this bot

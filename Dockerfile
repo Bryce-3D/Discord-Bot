@@ -1,8 +1,9 @@
 #Using https://www.youtube.com/watch?v=J7Fm7MdZn_E as a guide
 FROM python:3.9
-WORKDIR .
-COPY /Kumiko
+WORKDIR /workdir
+COPY /Kumiko .
 RUN python -m venv venv
-RUN source venv/bin/activate
+#https://askubuntu.com/questions/504546/error-message-source-not-found-when-running-a-script
+RUN . venv/bin/activate
 RUN python -m pip install discord requests
 CMD python -m Kumiko.main

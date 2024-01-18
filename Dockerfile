@@ -14,4 +14,4 @@ FROM python:3.9
 COPY /Kumiko /Kumiko
 COPY Token.py .
 RUN python -m pip install discord requests
-CMD ["python", "-m", "Kumiko.main"]
+ENTRYPOINT ["python", "-m", "Kumiko.main"]

@@ -1,0 +1,10 @@
+# flyctl launch added from .gitignore
+# **/Token.py
+**/Test.py
+**/Output.txt
+
+**/__pycache__
+**/.DS_Store
+
+**/venv
+fly.toml

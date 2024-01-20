@@ -19,7 +19,6 @@ class TicTacToe:
         The number of cells in the board filled so far.
         Set to None if the game hasn't started yet.
     '''
-
     #Convert int rep to str rep on the board
     num_to_chr = {-1:' ', 0:'X', 1:'O'}
 
@@ -145,25 +144,11 @@ class TicTacToe:
 #lobbies[i] = game state of lobby i
 lobbies = {}
 
-
 def MEX(a:set[int]) -> int:
     ans = 0
     while ans in a:
         ans += 1
     return ans
-
-def stringify_board(board:list[list[int]]) -> str:
-    '''
-    Takes in a board represented by a 3x3 list of ints and returns a 
-    string representation of the board
-    '''
-    b = [[num_to_chr[c] for c in r] for r in board]   #Convert to string rep
-    s  = f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
-    s += '---+---+---\n'
-    s += f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
-    s += '---+---+---\n'
-    s += f' {b[2][0]} | {b[2][1]} | {b[2][2]} '
-    return s
 
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args) -> None:

@@ -175,11 +175,11 @@ class TicTacToe:
         if not self.is_started():
             raise Exception('Game hasn\'t started yet')
         b = [[self.num_to_chr[c] for c in r] for r in self.board]   #Convert to string rep
-        s  = f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
-        s += '---+---+---\n'
-        s += f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
-        s += '---+---+---\n'
-        s += f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n'
+        s = (f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
+             '---+---+---\n'
+             f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
+             '---+---+---\n'
+             f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n')
         return s
     
     def __str__(self) -> str:
@@ -198,9 +198,7 @@ class TicTacToe:
             return s
 
         s += f'{self.filled} cells have been filled so far\n'
-        s += '```\n'
-        s += self.stringify_board()
-        s += '```\n'
+        s += f'```\n{self.stringify_board()}```\n'
         return s
 
 

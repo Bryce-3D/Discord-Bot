@@ -1,11 +1,13 @@
 # Discord-Bot
-Repository for any discord bots I make
+Repository for my discord bot Oumae Kumiko </br>
+Requires at least **Python 3.10** to run properly due to the use of built in </br>
+union type hinting (such as `int|None`) in some files.
 
 # Installation
 ```bash
-python -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
-python -m pip install discord requests
+python3.12 -m pip install discord requests
 ```
 
 # Adding of Token

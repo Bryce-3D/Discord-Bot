@@ -377,8 +377,11 @@ def tictactoe_swap(user_id:int) -> int:
     game_state.swap_players()
     return 0
 
+
+
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args) -> None:
+    '''Main command to handle the logic of %tictactoe'''
     if cmd == 'create':
         pass   #TODO
     if cmd == 'join':

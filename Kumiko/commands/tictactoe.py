@@ -207,11 +207,16 @@ lobbies:dict[int:TicTacToe] = {}
 #user_to_lobby[k] = lobby number of discord user with id `k`
 user_to_lobby:dict[int:int] = {}
 
-def MEX(d) -> int:
+def MEX(d:dict|set) -> int:
+    '''Returns the MEX of a dict or set'''
     ans = 0
     while ans in d:
         ans += 1
     return ans
+
+def is_in_lobby(user_id:int) -> bool:
+    '''Checks if `user_id` is in a lobby'''
+    return user_id in user_to_lobby
 
 def tictactoe_create(user_id:int, turn:int) -> int:
     '''
@@ -230,7 +235,7 @@ def tictactoe_create(user_id:int, turn:int) -> int:
     0 if the lobby was successfully generated
     1 if the user is already in a lobby
     '''
-    if user_id in user_to_lobby:
+    if is_in_lobby(user_id):
         return 1
     
     lobby_id = MEX(lobbies)
@@ -258,13 +263,13 @@ def tictactoe_join(user_id:int, lobby_id:int) -> int:
     Returns
     -------
     0 if the user joined the lobby successfully
-    1 if the lobby does not exist
-    2 if the user is already in a lobby
+    1 if the user is already in a lobby
+    2 if the lobby does not exist
     3 if the lobby is already full
     '''
-    if lobby_id not in lobbies:
+    if is_in_lobby(user_id):
         return 1
-    if user_id in user_to_lobby:
+    if lobby_id not in lobbies:
         return 2
 
     game_state = lobbies[lobby_id]
@@ -289,7 +294,7 @@ def tictactoe_start(user_id:int) -> int:
     2 if the user is in a non-full lobby
     3 if the user is already in a started lobby
     '''
-    if user_id not in user_to_lobby:
+    if not is_in_lobby(user_id):
         return 1
     lobby_id = user_to_lobby[user_id]
     game_state = lobbies[lobby_id]
@@ -316,7 +321,7 @@ def tictactoe_leave(user_id:int) -> int:
     2 if they left an unstarted lobby of 1 person
     3 if they left an unstarted lobby of 2 people
     '''
-    if user_id not in user_to_lobby:
+    if not is_in_lobby(user_id):
         return 0
     
     lobby_id = user_to_lobby[user_id]
@@ -333,7 +338,40 @@ def tictactoe_leave(user_id:int) -> int:
     else:
         return 3
 
+def tictactoe_swap(user_id:int) -> int:
+    '''
+    Swaps Player O and Player X in the lobby of `user_id`
+
+    Parameters
+    ----------
+    user_id : int
+        The user id of the person swapping O and X
+    
+    Returns
+    -------
+    0 if done successfully
+    1 if the user is not in a lobby
+    2 if the user is in a started lobby
+    '''
+    if not is_in_lobby(user_id):
+        return 1
+    
+    lobby_id = user_to_lobby[user_id]
+    game_state = lobbies[lobby_id]
+
+    if game_state.is_started():
+        return 2
+    
+    game_state.swap_players()
+    return 0
+
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args) -> None:
     if cmd == 'create':
-        id = MEX(lobbies)
+        pass   #TODO
+    if cmd == 'join':
+        pass   #TODO
+    if cmd == 'start':
+        pass   #TODO
+    if cmd == 'leave':
+        pass   #TODO

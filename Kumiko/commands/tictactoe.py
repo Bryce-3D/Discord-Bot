@@ -9,9 +9,9 @@ class TicTacToe:
     num_to_chr : dict[int:chr] (class attribute)
         Dict used to convert the internal int representation of a cell 
         of the board to its chr representation.
-    X : int|None
+    X_id : int|None
         The discord id of player X. Set to None if they don't exist.
-    O : int|None
+    O_id : int|None
         The discord id of player O. Set to None if they don't exist.
     board : list[list[int]]
         The 3x3 tic-tac-toe board.
@@ -33,8 +33,8 @@ class TicTacToe:
         o : int|None = None
             The discord id of player Y. Set to None if they don't exist
         '''
-        self.X:int|None = x
-        self.O:int|None = o
+        self.X_id:int|None = x
+        self.O_id:int|None = o
         self.board:list[list[int]] = [[-1 for c in range(3)] for r in range(3)]
         self.filled:int|None = None
     
@@ -53,13 +53,13 @@ class TicTacToe:
         1 if the game is already full
         '''
         if self.is_empty():
-            raise Exception("Called `add_player()` on an empty TicTacToe")
+            raise Exception("`TicTacToe.add_player()` on an empty TicTacToe")
         if self.is_full():
             return 1
-        if self.X == None:
-            self.X = id
+        if self.X_id == None:
+            self.X_id = id
         else:
-            self.O = id
+            self.O_id = id
         return 0
     
     def remove_player(self, id:int) -> int:
@@ -76,25 +76,25 @@ class TicTacToe:
         0 if the player was removed successfully
         1 if the player doesn't exist
         '''
-        if self.X != id and self.O != id:
+        if self.X_id != id and self.O_id != id:
             return 1
-        if self.X == id:
-            self.X = None
-        if self.Y == id:
-            self.Y = None
+        if self.X_id == id:
+            self.X_id = None
+        if self.O_id == id:
+            self.O_id = None
         return 0
 
     def swap_players(self) -> None:
         '''Swap Player X and Player O'''
-        self.X,self.O = self.O,self.X
+        self.X_id,self.O_id = self.O_id,self.X_id
     
     def is_empty(self) -> bool:
         '''Checks whether there are no players'''
-        return self.X == None and self.O == None
+        return self.X_id == None and self.O_id == None
     
     def is_full(self) -> bool:
         '''Checks whether there are two players'''
-        return self.X != None and self.O != None
+        return self.X_id != None and self.O_id != None
     
     def is_started(self) -> bool:
         '''Checks whether the game has started'''
@@ -149,17 +149,28 @@ class TicTacToe:
             return -1
         return None
     
-    def is_free(self, r:int, c:int) -> bool:
-        '''Checks whether the (r,c) cell is blank'''
-        return self.board[r][c] == -1
-    
-    def place(self, r:int, c:int) -> None:
-        '''Place an X or O in (r,c) depending on whose turn it is'''
-        if not self.is_free(r,c):
-            raise Exception("Trying to place into a filled cell")
+    def place(self, r:int, c:int) -> int:
+        '''
+        Place an X or O in (r,c) depending on whose turn it is
+        
+        Parameters
+        ----------
+        r : int
+            The row number of the cell being filled
+        c : int
+            The col number of the cell being filled
+        
+        Returns
+        -------
+        0 if the cell was filled successfully
+        1 if the cell is not available
+        '''
+        if self.board[r][c] != -1:
+            return 1
         #Use the parity of self.filled to determine the player
         self.board[r][c] = self.filled%2
         self.filled += 1
+        return 0
     
     def start(self) -> None:
         '''Starts the game'''
@@ -184,14 +195,14 @@ class TicTacToe:
     
     def __str__(self) -> str:
         '''Returns a string representation of the game state'''
-        if self.X == None:
+        if self.X_id == None:
             s  = 'There is currently no Player X\n'
         else:
-            s  = f'Player X has discord id {self.X}\n'
-        if self.O == None:
+            s  = f'Player X has discord id {self.X_id}\n'
+        if self.O_id == None:
             s += 'There is currently no Player O\n'
         else:
-            s += f'Player O has discord id {self.O}\n'
+            s += f'Player O has discord id {self.O_id}\n'
         
         if not self.is_started():
             s += 'The game hasn\'t started yet'
@@ -200,6 +211,7 @@ class TicTacToe:
         s += f'{self.filled} cells have been filled so far\n'
         s += f'```\n{self.stringify_board()}```\n'
         return s
+
 
 
 #lobbies[i] = game state of lobby `i``

@@ -16,7 +16,7 @@ From the **project root**, make a new file `Token.py` with one line in it.
 token='<your token here>'
 ```
 
-# Running the Bot
+# Running the Bot Locally
 From the **project root**, run the following.
 ```bash
 python -m Kumiko.main

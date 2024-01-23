@@ -168,6 +168,9 @@ async def nusmods(ctx:commands.Context, mod_code:str=None,
         mod_sems = 'Not offered this AY'
 
     mod_info = data['description']
+    #Trim to fit the 1024 char limit for a field
+    if len(mod_info) > 1024:
+        mod_info = mod_info[:1021] + '...'
 
     #Mods that need this mod as a prerequisite
     if 'fulfillRequirements' in data:
@@ -178,34 +181,28 @@ async def nusmods(ctx:commands.Context, mod_code:str=None,
     
     mod_mcs  = data['moduleCredit']
 
+    disclaimer  = '*Disclaimer: Prereqs might be inaccurate when viewing a '
+    disclaimer += 'non-canonical variant of a module such as CS1101S vs CS1010'
+
     emb = discord.Embed(
         title = f'{mod_code} {mod_name}',
         url   = f'https://nusmods.com/modules/{mod_code}',
         description = f'AY {AY}\n{mod_sems}',
         color = 0xff6d01
-    )
-    emb.add_field(
+    ).add_field(
         name   = 'Module Info',
         value  = mod_info,
         inline = False
-    )
-    emb.add_field(
+    ).add_field(
         name   = '*Prereq of',
         value  = mod_unlock,
         inline = True
-    )
-    emb.add_field(
+    ).add_field(
         name   = 'MCs',
         value  = mod_mcs,
         inline = True
-    )
-
-    disc  = '*Disclaimer: Prereqs might be inaccurate when viewing a '
-    disc += 'non-canonical variant of a module such as CS1101S vs CS1010'
-    emb.add_field(
-        name   = '',
-        value  = disc,
-        inline = False
+    ).set_footer(
+        text   = disclaimer
     )
 
     await ctx.channel.send(embed=emb)

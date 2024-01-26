@@ -16,3 +16,4 @@
 ### Misc
 - Max0r quotes
 - Fixing code style
+- Reverse a string

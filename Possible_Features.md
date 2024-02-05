@@ -6,6 +6,7 @@
 - NUSMods check
   - check number of vacancies in a module (luna)
   - suggestion: %nusmods MA5202 list → list all AYs that it's offered (htns)
+- Avy (retrieve pfp of a discord user)
 
 ### Games
 - Tic Tac Toe

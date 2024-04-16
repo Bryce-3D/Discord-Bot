@@ -1,5 +1,22 @@
 from ..bot_config import bot, commands
-from enum import Enum
+from enum import IntEnum
+
+class TTTStatusCode(IntEnum):
+    '''
+    Status Codes used to manage Tic-Tac-Toe.
+
+    Uses negative values so that functions returning nonnegative integers 
+    upon success can still work.
+    '''
+    Success         =  0
+    NotInLobby      = -1
+    InLobby         = -2
+    FullLobby       = -3
+    NotFullLobby    = -4
+    StartedLobby    = -5
+    UnstartedLobby  = -6
+    NotYourTurn     = -7
+    CellUnavailable = -8
 
 class TicTacToe:
     '''
@@ -87,15 +104,16 @@ class TicTacToe:
         
         Returns
         -------
-        0 if the cell was filled successfully
-        1 if the cell is not available
+        One of the following `TTTStatusCode`s
+            `Success`         if the cell was filled successfully
+            `CellUnavailable` if the cell is not available
         '''
         if self.board[r][c] != ' ':
-            return 1
+            return TTTStatusCode.CellUnavailable
         #Use the parity of self.filled to determine the player
         self.board[r][c] = self.get_turn()
         self.filled += 1
-        return 0
+        return TTTStatusCode.Success
     
     def restart(self) -> None:
         '''Restarts the game state'''
@@ -153,6 +171,21 @@ class TicTacToeLobby:
         '''Checks whether there are two players'''
         return self.X_id != None and self.O_id != None
 
+    def is_in(self, id:int) -> bool:
+        '''
+        Checks if a given user is in the lobby.
+
+        Parameters
+        ----------
+        id : int
+            The discord id of the user being checked.
+        
+        Returns
+        -------
+        True if the user is in the lobby, False otherwise.
+        '''
+        return self.X_id == id or self.O_id == id
+
     def add_player(self, id:int, name:str) -> int:
         '''
         Adds a player to the game
@@ -166,18 +199,22 @@ class TicTacToeLobby:
 
         Returns
         -------
-        0 if the player was added successfully
-        1 if the game is already full
+        One of the following `TTTStatusCode`s
+            `Success`   if the player was added successfully
+            `FullLobby` if the lobby is already full
+            `InLobby`   if the player is already in the lobby
         '''
         if self.is_full():
-            return 1
+            return TTTStatusCode.FullLobby
+        if self.is_in(id):
+            return TTTStatusCode.InLobby
         if self.X_id == None:
             self.X_id = id
             self.X_name = name
         else:
             self.O_id = id
             self.O_name = name
-        return 0
+        return TTTStatusCode.Success
     
     def remove_player(self, id:int) -> int:
         '''
@@ -190,40 +227,27 @@ class TicTacToeLobby:
 
         Returns
         -------
-        0 if the player was removed successfully
-        1 if the player doesn't exist
+        One of the following `TTTStatusCode`s
+            'Success'    if the player was removed successfully
+            'NotInLobby' if the player doesn't exist
         '''
         if self.O_id == id:
             self.O_id = None
             self.O_name = None
-            return 0
+            return TTTStatusCode.Success
         if self.X_id == id:
             self.X_id = None
             self.X_name = None
-            return 0
-        return 1
+            return TTTStatusCode.Success
+        return TTTStatusCode.NotInLobby
 
     def swap_players(self) -> None:
         '''Swap Player X and Player O'''
         if self.is_started:
-            raise Exception('Tried to swap players in started game')
+            err_msg = 'Tried to swap players in started Tic-Tac-Toe game'
+            raise Exception(err_msg)
         self.X_id,self.O_id = self.O_id,self.X_id
         self.X_name,self.O_name = self.O_name,self.X_name
-    
-    def is_in(self, id:int) -> bool:
-        '''
-        Checks if a given user is in the lobby.
-
-        Parameters
-        ----------
-        id : int
-            The discord id of the user being checked.
-        
-        Returns
-        -------
-        True if the user is in the lobby, False otherwise/
-        '''
-        return self.X_id == id or self.O_id == id
 
     def start(self) -> None:
         '''
@@ -231,14 +255,34 @@ class TicTacToeLobby:
         
         Returns
         -------
-        0 if the game was started successfully
-        1 if the lobby was not full
+        One of the following `TTTStatusCode`s
+            `Success`      if the game was started successfully
+            `NotFullLobby` if the lobby was not full
+            `StartedLobby` if the lobby has already started
         '''
         if not self.is_full():
-            return 1
+            return TTTStatusCode.NotFullLobby
+        if self.is_started:
+            return TTTStatusCode.StartedLobby
         self.is_started = True
-        return 0
+        return TTTStatusCode.Success
     
+    def get_turn_id(self) -> int:
+        '''
+        Returns the discord id of the next person to move.
+
+        Returns
+        -------
+        The discord id of the next person to move if the game has started.
+        `TTTStatusCode.UnstartedLobby` if the game has not started
+        '''
+        if not self.is_started:
+            return TTTStatusCode.UnstartedLobby
+        if self.tictactoe.get_turn() == 'X':
+            return self.X_id
+        else:
+            return self.O_id
+
     def reset(self) -> None:
         '''Resets the state of the game while keeping the players in'''
         self.tictactoe.restart()
@@ -287,7 +331,7 @@ class TicTacToeLobby:
             return 3
         else:
             return 0
-    
+
     def __str__(self) -> str:
         '''Returns a string representation of the game state'''
         s = f'Tic-tac-toe lobby {self.lobby_id}'
@@ -323,14 +367,16 @@ class TicTacToeBot:
         return ans
 
     @staticmethod
-    def is_in_lobby(user_id:int) -> bool:
+    def is_in_some_lobby(user_id:int) -> bool:
         '''Checks if `user_id` is in a lobby'''
         return user_id in TicTacToeBot.user_to_lobby
 
     @staticmethod
     def lobby_create(user_id:int) -> int:
         '''
-        Create a lobby for `user_id` such that they are player `turn`.
+        Create a lobby for `user_id`.
+
+        The creator for the lobby goes first (X) by default.
 
         Parameters
         ----------
@@ -342,13 +388,22 @@ class TicTacToeBot:
         The lobby id if the lobby was successfully generated
         -1 if the user is already in a lobby
         '''
-        if TicTacToeBot.is_in_lobby(user_id):
+        if TicTacToeBot.is_in_some_lobby(user_id):
             return -1
         lobby_id = TicTacToeBot.MEX(TicTacToeBot.lobbies)
         lobby = TicTacToeLobby(lobby_id, X_id=user_id)
         TicTacToeBot.lobbies[lobby_id] = lobby
         TicTacToeBot.user_to_lobby[user_id] = lobby_id
         return lobby_id
+
+    @staticmethod
+    def lobby_destroy(user_id:int) -> int:
+        '''
+        Destroys the lobby that `user_id` is currently in.
+
+        Parameters
+        ------
+        '''
 
     @staticmethod
     def join(lobby_id:int, user_id:int) -> int:
@@ -464,6 +519,7 @@ class TicTacToeBot:
         lobby.swap_players()
         return 0
 
+    @staticmethod
     def place(user_id:int, r:int, c:int) -> int:
         '''
         Lets the user place their mark on (r,c)
@@ -480,8 +536,19 @@ class TicTacToeBot:
         Returns
         -------
         0 if the move was done successfully
-        TODO  
+        1 if the user is not in a lobby
+        2 if the user is in an unstarted lobby
+        3 if it is not the user's turn
+        4 if the spot was already filled
         '''
+        if not TicTacToeBot.is_in_some_lobby(user_id):
+            return 1
+        lobby_id = TicTacToeBot.user_to_lobby[user_id]
+        lobby = TicTacToeBot.lobbies[lobby_id]
+        status_code = lobby.place(user_id, r, c)
+        #Error codes from `TicTacToeLobby.place()` are 1 smaller
+        if status_code != 0:
+            return status_code + 1
         return 0
 
 

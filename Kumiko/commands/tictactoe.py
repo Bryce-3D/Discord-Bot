@@ -2,21 +2,18 @@ from ..bot_config import bot, commands
 from enum import IntEnum
 
 class TTTStatusCode(IntEnum):
-    '''
-    Status Codes used to manage Tic-Tac-Toe.
-
-    Uses negative values so that functions returning nonnegative integers 
-    upon success can still work.
-    '''
-    Success         =  0
-    NotInLobby      = -1
-    InLobby         = -2
-    FullLobby       = -3
-    NotFullLobby    = -4
-    StartedLobby    = -5
-    UnstartedLobby  = -6
-    NotYourTurn     = -7
-    CellUnavailable = -8
+    '''Status Codes used to manage Tic-Tac-Toe'''
+    Success          =  0
+    NotInLobby       =  1
+    InLobby          =  2
+    FullLobby        =  3
+    NotFullLobby     =  4
+    StartedLobby     =  5
+    UnstartedLobby   =  6
+    NonexistentLobby =  7
+    NotYourTurn      =  8
+    CellOutOfRange   =  9
+    CellUnavailable  = 10
 
 class TicTacToe:
     '''
@@ -51,10 +48,15 @@ class TicTacToe:
         Returns
         -------
         True if player has a line on the board, False otherwise
+
+        Raises
+        ------
+        Exception() if the player is not `X` or `O`.
         '''
         if player not in {'X','O'}:
-            s = f'TicTacToe.win_check({player}) is an invalid function call'
-            raise Exception(s)
+            err_msg  = f'TicTacToe.win_check({player}) '
+            err_msg += 'is an invalid function call'
+            raise Exception(err_msg)
         
         #Check rows
         for r in range(3):
@@ -71,16 +73,21 @@ class TicTacToe:
             return True
         return False
     
-    def is_done(self) -> bool:
+    def get_winner(self) -> str|None:
         '''
-        Checks if a game is completed.
+        Gets the winner of the Tic-Tac-Toe game.
 
         Returns
         -------
-        True if one of the players has won, False otherwise.
+        'X' or 'O' if one of them has won the game.
+        `None` if no one has won yet.
         '''
-        return self.win_check('X') or self.win_check('O')
-    
+        if self.win_check('X'):
+            return 'X'
+        if self.win_check('O'):
+            return 'O'
+        return None
+
     def get_turn(self) -> str:
         '''
         Returns whose turn it currently is
@@ -91,7 +98,7 @@ class TicTacToe:
         '''
         return 'X' if self.filled%2 == 0 else 'O'
 
-    def place(self, r:int, c:int) -> int:
+    def place(self, r:int, c:int) -> TTTStatusCode:
         '''
         Place an X or O in (r,c) depending on whose turn it is
         
@@ -106,8 +113,11 @@ class TicTacToe:
         -------
         One of the following `TTTStatusCode`s
             `Success`         if the cell was filled successfully
+            `CellOutOfRange`  if the provided coordinates are out of range
             `CellUnavailable` if the cell is not available
         '''
+        if r < 0 or r > 2 or c < 0 or c > 2:
+            return TTTStatusCode.CellOutOfRange
         if self.board[r][c] != ' ':
             return TTTStatusCode.CellUnavailable
         #Use the parity of self.filled to determine the player
@@ -122,7 +132,7 @@ class TicTacToe:
                 self.board[r][c] = ' '
         self.filled = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         '''Returns a string representation of the board state'''
         b = self.board
         s = (f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
@@ -142,6 +152,8 @@ class TicTacToeLobby:
         The tic-tac-toe board.
     lobby_id : int
         The id of this lobby.
+    player_count : int
+        The number of players currently in the lobby.
     X_id : int|None
         The discord id of player X. Set to None if they don't exist.
     O_id : int|None
@@ -163,13 +175,15 @@ class TicTacToeLobby:
         self.O_name:str|None = O_name
         self.is_started:bool = False
     
-    def is_empty(self) -> bool:
-        '''Checks whether there are no players'''
-        return self.X_id == None and self.O_id == None
-
-    def is_full(self) -> bool:
-        '''Checks whether there are two players'''
-        return self.X_id != None and self.O_id != None
+    @property
+    def player_count(self) -> int:
+        '''The number of players in the lobby'''
+        ans = 0
+        if self.X_id != None:
+            ans += 1
+        if self.O_id != None:
+            ans += 1
+        return ans
 
     def is_in(self, id:int) -> bool:
         '''
@@ -186,9 +200,9 @@ class TicTacToeLobby:
         '''
         return self.X_id == id or self.O_id == id
 
-    def add_player(self, id:int, name:str) -> int:
+    def add_player(self, id:int, name:str) -> TTTStatusCode:
         '''
-        Adds a player to the game
+        Adds a player to the game.
 
         Parameters
         ----------
@@ -204,7 +218,7 @@ class TicTacToeLobby:
             `FullLobby` if the lobby is already full
             `InLobby`   if the player is already in the lobby
         '''
-        if self.is_full():
+        if self.player_count == 2:
             return TTTStatusCode.FullLobby
         if self.is_in(id):
             return TTTStatusCode.InLobby
@@ -216,9 +230,11 @@ class TicTacToeLobby:
             self.O_name = name
         return TTTStatusCode.Success
     
-    def remove_player(self, id:int) -> int:
+    def remove_player(self, id:int) -> TTTStatusCode:
         '''
-        Removes a player from a game
+        Removes a player from a game.
+
+        Also automatically resets the lobby if the lobby was started.
 
         Parameters
         ----------
@@ -228,9 +244,11 @@ class TicTacToeLobby:
         Returns
         -------
         One of the following `TTTStatusCode`s
-            'Success'    if the player was removed successfully
-            'NotInLobby' if the player doesn't exist
+            'Success'      if the player was removed successfully
+            'NotInLobby'   if the player doesn't exist
         '''
+        if self.is_started:
+            self.reset()
         if self.O_id == id:
             self.O_id = None
             self.O_name = None
@@ -241,17 +259,25 @@ class TicTacToeLobby:
             return TTTStatusCode.Success
         return TTTStatusCode.NotInLobby
 
-    def swap_players(self) -> None:
-        '''Swap Player X and Player O'''
+    def swap_players(self) -> TTTStatusCode:
+        '''
+        Swap Player X and Player O.
+        
+        Returns
+        -------
+        One of the following `TTTStatusCode`s
+            `Success`      if the swap was successful
+            `StartedLobby` if the lobby was already started
+        '''
         if self.is_started:
-            err_msg = 'Tried to swap players in started Tic-Tac-Toe game'
-            raise Exception(err_msg)
+            return TTTStatusCode.StartedLobby
         self.X_id,self.O_id = self.O_id,self.X_id
         self.X_name,self.O_name = self.O_name,self.X_name
+        return TTTStatusCode.Success
 
-    def start(self) -> None:
+    def start(self) -> TTTStatusCode:
         '''
-        Starts the game
+        Starts the game.
         
         Returns
         -------
@@ -260,24 +286,24 @@ class TicTacToeLobby:
             `NotFullLobby` if the lobby was not full
             `StartedLobby` if the lobby has already started
         '''
-        if not self.is_full():
+        if self.player_count != 2:
             return TTTStatusCode.NotFullLobby
         if self.is_started:
             return TTTStatusCode.StartedLobby
         self.is_started = True
         return TTTStatusCode.Success
     
-    def get_turn_id(self) -> int:
+    def get_turn_id(self) -> int|None:
         '''
         Returns the discord id of the next person to move.
 
         Returns
         -------
-        The discord id of the next person to move if the game has started.
-        `TTTStatusCode.UnstartedLobby` if the game has not started
+        The discord id of the next person to move if the game has started 
+        or `None` if the game has not started.
         '''
         if not self.is_started:
-            return TTTStatusCode.UnstartedLobby
+            return None
         if self.tictactoe.get_turn() == 'X':
             return self.X_id
         else:
@@ -288,7 +314,7 @@ class TicTacToeLobby:
         self.tictactoe.restart()
         self.is_started = False
     
-    def place(self, id:int, r:int, c:int) -> int:
+    def place(self, id:int, r:int, c:int) -> TTTStatusCode:
         '''
         Lets the user with discord id `id` put at (r,c).
 
@@ -305,32 +331,29 @@ class TicTacToeLobby:
         
         Returns
         -------
-        0 if the move was done successfully
-        1 if the game hasn't started
-        2 if it is not the player's turn
-        3 if the spot is already filled
+        One of the following `TTTStatusCode`s
+            `Success`         if the move was done successfully
+            `NotInLobby`      if the user is not in the lobby
+            `UnstartedLobby`  if the game hasn't started
+            `NotYourTurn`     if it is not the player's turn
+            `CellOutOfRange`  if the provided coordinates are out of range
+            `CellUnavailable` if the spot is already filled
         '''
         #User is not in the lobby (should not happen)
         if not self.is_in(id):
-            e = 'TicTacToeLobby.place() called with an id not in the lobby'
-            raise Exception(e)
-        
+            return TTTStatusCode.NotInLobby
         if not self.is_started:
-            return 1
+            return TTTStatusCode.UnstartedLobby
 
         #O moved during X's turn
         if self.tictactoe.get_turn() == 'X' and self.O_id == id:
-            return 2
+            return TTTStatusCode.NotYourTurn
         #X moved during O's turn
         if self.tictactoe.get_turn() == 'O' and self.X_id == id:
-            return 2
+            return TTTStatusCode.NotYourTurn
         
-        #Try to do the move
-        status = self.tictactoe.place(r,c)
-        if status == 1:   #Spot already filled
-            return 3
-        else:
-            return 0
+        #Try to do the move and return the status code
+        return self.tictactoe.place(r,c)
 
     def __str__(self) -> str:
         '''Returns a string representation of the game state'''
@@ -352,11 +375,24 @@ class TicTacToeLobby:
         s += f'```\n{self.tictactoe}```\n'
         return s
 
-class TicTacToeBot:
-    #lobbies[i] = lobby number i
-    lobbies:dict[int,TicTacToeLobby] = {}
-    #user_to_lobby[k] = lobby number of discord user with id `k`
-    user_to_lobby:dict[int,int] = {}
+class TicTacToeLobbies:
+    '''
+    A class to represent the set of all lobbies.
+
+    Used somewhat like a namespace to neatly group functions relating to the 
+    set of all lobbies together.
+
+    Attributes
+    ----------
+    lobby_id_to_lobby : dict[int,TicTacToeLobby]
+        A dictionary mapping a lobby id to the corresponding lobby.
+    user_to_lobby_id : dict[int,int]
+        A dictionary mapping a discord id to its corresponding lobby id.
+    '''
+    #lobby_id_to_lobby[i] = lobby number i
+    lobby_id_to_lobby:dict[int,TicTacToeLobby] = {}
+    #user_to_lobby_id[k] = lobby id of discord user with id `k`
+    user_to_lobby_id:dict[int,int] = {}
 
     @staticmethod
     def MEX(d:dict|set) -> int:
@@ -369,10 +405,10 @@ class TicTacToeBot:
     @staticmethod
     def is_in_some_lobby(user_id:int) -> bool:
         '''Checks if `user_id` is in a lobby'''
-        return user_id in TicTacToeBot.user_to_lobby
+        return user_id in TicTacToeLobbies.user_to_lobby_id
 
     @staticmethod
-    def lobby_create(user_id:int) -> int:
+    def lobby_create(user_id:int) -> int|None:
         '''
         Create a lobby for `user_id`.
 
@@ -385,30 +421,53 @@ class TicTacToeBot:
         
         Returns
         -------
-        The lobby id if the lobby was successfully generated
-        -1 if the user is already in a lobby
+        The lobby id of the newly generated lobby or 
+        `None` if the user is already in a lobby.
         '''
-        if TicTacToeBot.is_in_some_lobby(user_id):
-            return -1
-        lobby_id = TicTacToeBot.MEX(TicTacToeBot.lobbies)
+        if TicTacToeLobbies.is_in_some_lobby(user_id):
+            return None
+        lobby_id = TicTacToeLobbies.MEX(TicTacToeLobbies.lobby_id_to_lobby)
         lobby = TicTacToeLobby(lobby_id, X_id=user_id)
-        TicTacToeBot.lobbies[lobby_id] = lobby
-        TicTacToeBot.user_to_lobby[user_id] = lobby_id
+        TicTacToeLobbies.lobby_id_to_lobby[lobby_id] = lobby
+        TicTacToeLobbies.user_to_lobby_id[user_id] = lobby_id
         return lobby_id
 
     @staticmethod
-    def lobby_destroy(user_id:int) -> int:
+    def lobby_destroy(user_id:int) -> TTTStatusCode:
         '''
         Destroys the lobby that `user_id` is currently in.
 
+        Does so by removing all relevant entries in both the user_to_lobby_id 
+        and lobby_id_to_lobby dictionaries.
+
         Parameters
-        ------
+        ----------
+        user_id : int
+            The discord id of the user who is destroying his current lobby.
+        
+        Returns
+        -------
+        One of the following `TTTStatusCode`s
+            `Success`    if the lobby was successfully destroyed
+            `NotInLobby` if the user is not in some lobby
         '''
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        X_id = lobby.X_id
+        O_id = lobby.O_id
+        if X_id != None:
+            del TicTacToeLobbies.user_to_lobby_id[X_id]
+        if O_id != None:
+            del TicTacToeLobbies.user_to_lobby_id[O_id]
+        del TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        return TTTStatusCode.Success
 
     @staticmethod
-    def join(lobby_id:int, user_id:int) -> int:
+    def join(lobby_id:int, user_id:int) -> TTTStatusCode:
         '''
-        Let `user_id` join the lobby `lobby_id`
+        Let `user_id` join the lobby `lobby_id`.
 
         Parameters
         ----------
@@ -419,23 +478,24 @@ class TicTacToeBot:
         
         Returns
         -------
-        0 if the user joined the lobby successfully
-        1 if the lobby does not exist
-        2 if the user is already in a lobby
-        3 if the lobby is already full
+        One of the following `TTTStatusCode`s
+            `Success`          if the user joined the lobby successfully
+            `NonexistentLobby` if the lobby does not exist
+            `InLobby`          if the user is already in a lobby
+            `FullLobby`        if the lobby is already full
         '''
-        if lobby_id not in TicTacToeBot.lobbies:
-            return 1
-        if TicTacToeBot.is_in_lobby(user_id):
-            return 2
-        lobby = TicTacToeBot.lobbies[lobby_id]
-        if lobby.is_full():
-            return 3
+        if lobby_id not in TicTacToeLobbies.lobby_id_to_lobby:
+            return TTTStatusCode.NonexistentLobby
+        if TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.InLobby
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        if lobby.player_count == 2:
+            return TTTStatusCode.FullLobby
         lobby.add_player(user_id)
-        return 0
+        return TTTStatusCode.Success
 
     @staticmethod
-    def start(user_id:int) -> int:
+    def start(user_id:int) -> TTTStatusCode:
         '''
         Starts the tic-tac-toe game that `user_id` is in
 
@@ -446,26 +506,31 @@ class TicTacToeBot:
         
         Returns
         -------
-        0 if the game was started successfully
-        1 if the user is not in a lobby
-        2 if the user is in a non-full lobby
-        3 if the user is already in a started lobby
+        One of the following `TTTStatusCode`s
+            `Success`      if the game was started successfully
+            `NotInLobby`   if the user is not in a lobby
+            `NotFullLobby  if the user is in a non-full lobby
+            `StartedLobby` if the user is already in a started lobby
         '''
-        if not TicTacToeBot.is_in_lobby(user_id):
-            return 1
-        lobby_id = TicTacToeBot.user_to_lobby[user_id]
-        lobby = TicTacToeBot.lobbies[lobby_id]
-        if not lobby.is_full():
-            return 2
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        if lobby.player_count != 2:
+            return TTTStatusCode.NotFullLobby
         if lobby.is_started:
-            return 3
+            return TTTStatusCode.StartedLobby
         lobby.start()
-        return 0
+        return TTTStatusCode.Success
 
     @staticmethod
-    def leave(user_id:int) -> int:
+    def leave(user_id:int) -> TTTStatusCode:
         '''
-        Lets a user leave a tic-tac-toe lobby
+        Lets a user leave a tic-tac-toe lobby.
+
+        If the lobby was a started game, also resets the game.
+        If the lobby is empty after the player leaves, also destroys 
+        the lobby.
 
         Parameters
         ----------
@@ -474,28 +539,24 @@ class TicTacToeBot:
         
         Returns
         -------
-        0 if they are not in a lobby
-        1 if they left a started lobby
-        2 if they left an unstarted lobby of 1 person
-        3 if they left an unstarted lobby of 2 people
+        One of the following `TTTStatusCode`s
+            `Success`    if the user left the lobby successfully
+            `NotInLobby` if they are not in a lobby
         '''
-        if not TicTacToeBot.is_in_lobby(user_id):
-            return 0
-        lobby_id = TicTacToeBot.user_to_lobby[user_id]
-        lobby = TicTacToeBot.lobbies[lobby_id]
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
 
         if lobby.is_started:
             lobby.reset()
-            lobby.remove_player(user_id)
-            return 1
         lobby.remove_player(user_id)
-        if lobby.is_empty():
-            return 2
-        else:
-            return 3
+        del TicTacToeLobbies.user_to_lobby_id[user_id]
+        if lobby.player_count == 0:
+            del TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
 
     @staticmethod
-    def swap(user_id:int) -> int:
+    def swap(user_id:int) -> TTTStatusCode:
         '''
         Swaps Player O and Player X in the lobby of `user_id`
 
@@ -506,21 +567,22 @@ class TicTacToeBot:
         
         Returns
         -------
-        0 if done successfully
-        1 if the user is not in a lobby
-        2 if the user is in a started lobby
+        One of the following `TTTStatusCode`s
+            `Success`      if swapped successfully
+            `NotInLobby`   if the user is not in a lobby
+            `StartedLobby` if the user is in a started lobby
         '''
-        if not TicTacToeBot.is_in_lobby(user_id):
-            return 1    
-        lobby_id = TicTacToeBot.user_to_lobby[user_id]
-        lobby = TicTacToeBot.lobbies[lobby_id]
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
         if lobby.is_started:
-            return 2
+            return TTTStatusCode.StartedLobby
         lobby.swap_players()
-        return 0
+        return TTTStatusCode.Success
 
     @staticmethod
-    def place(user_id:int, r:int, c:int) -> int:
+    def place(user_id:int, r:int, c:int) -> TTTStatusCode:
         '''
         Lets the user place their mark on (r,c)
 
@@ -535,21 +597,22 @@ class TicTacToeBot:
         
         Returns
         -------
-        0 if the move was done successfully
-        1 if the user is not in a lobby
-        2 if the user is in an unstarted lobby
-        3 if it is not the user's turn
-        4 if the spot was already filled
+        One of the following `TTTStatusCode`s
+            `Success`         if the move was done successfully
+            `NotInLobby`      if the user is not in the lobby
+            `UnstartedLobby`  if the game hasn't started
+            `NotYourTurn`     if it is not the player's turn
+            `CellOutOfRange`  if the provided coordinates are out of range
+            `CellUnavailable` if the spot is already filled
         '''
-        if not TicTacToeBot.is_in_some_lobby(user_id):
-            return 1
-        lobby_id = TicTacToeBot.user_to_lobby[user_id]
-        lobby = TicTacToeBot.lobbies[lobby_id]
-        status_code = lobby.place(user_id, r, c)
-        #Error codes from `TicTacToeLobby.place()` are 1 smaller
-        if status_code != 0:
-            return status_code + 1
-        return 0
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+
+        #Try to do the move and return the status code
+        return lobby.place(user_id, r, c)
+
 
 
 @bot.command()

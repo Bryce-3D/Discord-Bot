@@ -22,6 +22,10 @@ class TicTacToe:
     Contains the tic-tac-toe board as well as a lot of helper functions to 
     make it easier to use. X always goes before O in this implementation.
 
+    The returned `TTTStatusCode`s listed in the documentation are listed in 
+    the order they are checked in the implementation, with the exception 
+    of `TTTStatusCode.Success` always being the first listed one.
+
     Attributes
     ----------
     board : list[list[str]]
@@ -145,6 +149,10 @@ class TicTacToe:
 class TicTacToeLobby:
     '''
     A class to represent a tic-tac-toe game lobby.
+
+    The returned `TTTStatusCode`s listed in the documentation are listed in 
+    the order they are checked in the implementation, with the exception 
+    of `TTTStatusCode.Success` always being the first listed one.
 
     Attributes
     ----------
@@ -379,8 +387,12 @@ class TicTacToeLobbies:
     '''
     A class to represent the set of all lobbies.
 
-    Used somewhat like a namespace to neatly group functions relating to the 
-    set of all lobbies together.
+    This is functionally a namespace to neatly group everything relating to 
+    the set of all lobbies together.
+
+    The returned `TTTStatusCode`s listed in the documentation are listed in 
+    the order they are checked in the implementation, with the exception 
+    of `TTTStatusCode.Success` always being the first listed one.
 
     Attributes
     ----------
@@ -463,6 +475,20 @@ class TicTacToeLobbies:
             del TicTacToeLobbies.user_to_lobby_id[O_id]
         del TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
         return TTTStatusCode.Success
+
+    @staticmethod
+    def get_lobby_id(user_id:int) -> int|None:
+        '''
+        Get the lobby id of `user_id`, or `None if the user is not in one.
+
+        Returns
+        -------
+        The lobby id if the user is in some lobby.
+        'None' if the user is not in any lobby.
+        '''
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return None
+        return TicTacToeLobbies.user_to_lobby_id[user_id]
 
     @staticmethod
     def join(lobby_id:int, user_id:int) -> TTTStatusCode:
@@ -613,16 +639,146 @@ class TicTacToeLobbies:
         #Try to do the move and return the status code
         return lobby.place(user_id, r, c)
 
+class TTTRespMsg:
+    '''
+    A class to generate response messages related to `%tictactoe`.
+
+    This is functionally a namespace to neatly group everything relating to 
+    making the messages for the bot to send together.
+
+    Each of the function names is one of
+        cmd_TTTStatusCode
+        cmd_reason_for_error
+    '''
+    @staticmethod
+    def create_success(lobby_id:str) -> str:
+        '''Message when a user successfully creates a lobby.'''
+        return (f"Created a lobby with id {lobby_id}\n"
+                f"Use `%tictactoe join {lobby_id}` to join")
+
+    @staticmethod
+    def create_in_lobby(username:str) -> str:
+        '''Message when a user creates a lobby while already inside one.'''
+        return f"{username}, you're already in a lobby"
+
+    @staticmethod
+    def join_missing_args() -> str:
+        '''Message when a lobby id is not given when joining.'''
+        return (f"Please put a lobby id to join\n"
+                "Sample usage: `%tictactoe join 21")
+    
+    @staticmethod
+    def join_nonnumeric_lobby_id(lobby_id:str) -> str:
+        '''Message when a lobby id contains non-digit characters.'''
+        return (f"{lobby_id} is not a valid lobby id, please use the "
+                "digits from 0 to 9 only")
+    
+    @staticmethod
+    def join_nonexistent_lobby(lobby_id:int) -> str:
+        '''Message when trying to join a non-existent lobby.'''
+        return f"No lobbies with the id {lobby_id} currently exist"
+    
+    @staticmethod
+    def join_in_lobby() -> str:
+        '''Message when trying to join while already in some lobby.'''
+        return ("You're already in a lobby. Please leave first if "
+                "you wish to join another lobby.")
+    
+    @staticmethod
+    def join_full_lobby(lobby_id:int) -> str:
+        '''Message when trying to join a full lobby.'''
+        return f"Sorry, lobby {lobby_id} is already full"
+    
+    @staticmethod
+    def join_success(lobby_id:int) -> str:
+        '''Message when successfully joining a lobby.'''
+        return f"Successfully joined lobby {lobby_id}"
+    
 
 
 @bot.command()
-async def tictactoe(ctx:commands.Context, cmd:str, *args) -> None:
-    '''Main command to handle the logic of %tictactoe'''
+async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
+    '''
+    Main command to handle the logic of %tictactoe
+
+    If more arguments are provided than necessary, then the extra 
+    arguments are simply ignored when `%tictactoe` is invoked.
+    
+    Arguments
+    ---------
+    cmd : str
+        The command being invoked. This is not case sensitive. 
+        The inputted command must be one of
+            create
+            join
+            leave
+            swap
+            start
+            place
+            view
+    *args : str
+        The arguments passed to the given command
+    '''
+    cmd = cmd.lower()
+    user_id:int = ctx.author.id
+    username:str = ctx.author.display_name
+
+    #Usage: `%tictactoe create`
     if cmd == 'create':
+        lobby_id = TicTacToeLobbies.lobby_create(user_id)
+        if lobby_id != None:
+            await ctx.send(TTTRespMsg.create_success(lobby_id))
+        else:
+            await ctx.send(TTTRespMsg.create_in_lobby(username))
+        return
+    
+    #Usage: `%tictactoe join lobby_id`
+    elif cmd == 'join':
+        if len(args) < 1:
+            await ctx.send(TTTRespMsg.join_missing_args())
+            return
+        
+        lobby_id = args[0]
+        if not lobby_id.isdigit():
+            await ctx.send(TTTRespMsg.join_nonnumeric_lobby_id(lobby_id))
+            return
+        
+        lobby_id = int(lobby_id)
+        status_code = TicTacToeLobbies.join(lobby_id, user_id)
+
+        if status_code == TTTStatusCode.NonexistentLobby:
+            await ctx.send(TTTRespMsg.join_nonexistent_lobby(lobby_id))
+        elif status_code == TTTStatusCode.InLobby:
+            await ctx.send(TTTRespMsg.join_in_lobby())
+        elif status_code == TTTStatusCode.FullLobby:
+            await ctx.send(TTTRespMsg.join_full_lobby(lobby_id))
+        elif status_code == TTTStatusCode.Success:
+            await ctx.send(TTTRespMsg.join_success(lobby_id))
+        else:
+            err_msg = ("Invalid state attained in %tictactoe join\n"
+                       f"Command used: %tictactoe join {' '.join(args)}\n"
+                       f"Invoked by: {username} ({user_id})")
+            raise Exception(err_msg)
+
+    #Usage: `%tictactoe leave`
+    elif cmd == 'leave':
         pass   #TODO
-    if cmd == 'join':
+
+    #Usage: `%tictactoe swap`
+    elif cmd == 'swap':
         pass   #TODO
-    if cmd == 'start':
+
+    #Usage: `%tictactoe start`
+    elif cmd == 'start':
         pass   #TODO
-    if cmd == 'leave':
+
+    #Usage: `%tictactoe place row col`
+    elif cmd == 'place':
+        pass   #TODO
+
+    #Usage: `%tictactoe view`
+    elif cmd == 'view':
+        pass   #TODO
+    
+    else:
         pass   #TODO

@@ -639,6 +639,12 @@ class TicTacToeLobbies:
         #Try to do the move and return the status code
         return lobby.place(user_id, r, c)
 
+
+
+def ping(user_id:int|str) -> str:
+    '''Takes in a discord id and returns a string to ping that user'''
+    return f'<@!{user_id}>'
+
 class TTTRespMsg:
     '''
     A class to generate response messages related to `%tictactoe`.
@@ -650,16 +656,16 @@ class TTTRespMsg:
         cmd_TTTStatusCode
         cmd_reason_for_error
     '''
-    
-    class Create:
-        @staticmethod
-        def success(lobby_id:str) -> str:
-            return (f"Created a lobby with id {lobby_id}\n"
+    @staticmethod
+    def create(lobby_id:str|None, user_id:int) -> str:
+        if lobby_id != None:
+            return (f"Created a lobby with id {lobby_id} for {ping(user_id)}\n"
                     f"Use `%tictactoe join {lobby_id}` to join")
+        else:
+            return f"{ping(user_id)}, you're already in a lobby"
 
-        @staticmethod
-        def in_lobby(username:str) -> str:
-            return f"{username}, you're already in a lobby"
+    @staticmethod
+    def join()
 
     class Join:
         @staticmethod
@@ -706,7 +712,6 @@ class TTTRespMsg:
         @staticmethod
         def not_in_lobby() -> str:
             return "You cannot swap places if you're not in a lobby"
-
 
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
@@ -765,10 +770,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     #Usage: `%tictactoe create`
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
-        if lobby_id != None:
-            await ctx.send(TTTRespMsg.Create.success(lobby_id))
-        else:
-            await ctx.send(TTTRespMsg.Create.in_lobby(username))
+        TTTRespMsg.create(lobby_id,user_id)
         return
     
     #Usage: `%tictactoe join lobby_id`

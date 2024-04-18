@@ -651,42 +651,61 @@ class TTTRespMsg:
         cmd_reason_for_error
     '''
     
-    @staticmethod
-    def create_success(lobby_id:str) -> str:
-        return (f"Created a lobby with id {lobby_id}\n"
-                f"Use `%tictactoe join {lobby_id}` to join")
+    class Create:
+        @staticmethod
+        def success(lobby_id:str) -> str:
+            return (f"Created a lobby with id {lobby_id}\n"
+                    f"Use `%tictactoe join {lobby_id}` to join")
 
-    @staticmethod
-    def create_in_lobby(username:str) -> str:
-        return f"{username}, you're already in a lobby"
+        @staticmethod
+        def in_lobby(username:str) -> str:
+            return f"{username}, you're already in a lobby"
 
-    @staticmethod
-    def join_missing_args() -> str:
-        return (f"Please put a lobby id to join\n"
-                "Sample usage: `%tictactoe join 21")
+    class Join:
+        @staticmethod
+        def success(lobby_id:int) -> str:
+            return f"Successfully joined lobby {lobby_id}"
+
+        @staticmethod
+        def missing_args() -> str:
+            return (f"Please put a lobby id to join\n"
+                    "Sample usage: `%tictactoe join 21")
+        
+        @staticmethod
+        def nonnumeric_lobby_id(lobby_id:str) -> str:
+            return (f"{lobby_id} is not a valid lobby id, please use the "
+                    "digits from 0 to 9 only")
+        
+        @staticmethod
+        def nonexistent_lobby(lobby_id:int) -> str:
+            return f"No lobbies with the id {lobby_id} currently exist"
+        
+        @staticmethod
+        def in_lobby() -> str:
+            return ("You're already in a lobby. Please leave first if "
+                    "you wish to join another lobby.")
+        
+        @staticmethod
+        def full_lobby(lobby_id:int) -> str:
+            return f"Sorry, lobby {lobby_id} is already full"
+        
+    class Leave:
+        @staticmethod
+        def success() -> str:
+            return "Successfully left the lobby"
+        
+        @staticmethod
+        def not_in_lobby() -> str:
+            return "You are currently not in any lobby"
     
-    @staticmethod
-    def join_nonnumeric_lobby_id(lobby_id:str) -> str:
-        return (f"{lobby_id} is not a valid lobby id, please use the "
-                "digits from 0 to 9 only")
-    
-    @staticmethod
-    def join_nonexistent_lobby(lobby_id:int) -> str:
-        return f"No lobbies with the id {lobby_id} currently exist"
-    
-    @staticmethod
-    def join_in_lobby() -> str:
-        return ("You're already in a lobby. Please leave first if "
-                "you wish to join another lobby.")
-    
-    @staticmethod
-    def join_full_lobby(lobby_id:int) -> str:
-        return f"Sorry, lobby {lobby_id} is already full"
-    
-    @staticmethod
-    def join_success(lobby_id:int) -> str:
-        return f"Successfully joined lobby {lobby_id}"
-    
+    class Swap:
+        @staticmethod
+        def success() -> str:
+            return "Successfully swapped X and O players in your lobby"
+        
+        @staticmethod
+        def not_in_lobby() -> str:
+            return "You cannot swap places if you're not in a lobby"
 
 
 @bot.command()
@@ -712,6 +731,33 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     *args : str
         The arguments passed to the given command
     '''
+    def raise_debug_exception(cmd:str, args:tuple[str], 
+                              username:str, user_id:int) -> None:
+        '''
+        Helper function to raise an exception in invalid states.
+
+        Arguments
+        ---------
+        cmd : str
+            The called tictactoe command that caused the invalid state
+        args : tuple[str]
+            The arguments passed to the tictactoe command
+        username : str
+            The discord name (server profile) of the person who caused 
+            the invalid state
+        user_id : int
+            The discord id of the person who caused the invalid state
+
+        Raises
+        ------
+        An exception with a message containing information on how the 
+        invalid state was triggered.
+        '''
+        err_msg = ("Invalid state attained in %tictactoe\n"
+                   f"Command used: %tictactoe {cmd} {' '.join(args)}\n"
+                   f"Invoked by: {username} ({user_id})")
+        raise Exception(err_msg)
+
     cmd = cmd.lower()
     user_id:int = ctx.author.id
     username:str = ctx.author.display_name
@@ -720,46 +766,51 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
         if lobby_id != None:
-            await ctx.send(TTTRespMsg.create_success(lobby_id))
+            await ctx.send(TTTRespMsg.Create.success(lobby_id))
         else:
-            await ctx.send(TTTRespMsg.create_in_lobby(username))
+            await ctx.send(TTTRespMsg.Create.in_lobby(username))
         return
     
     #Usage: `%tictactoe join lobby_id`
     elif cmd == 'join':
         if len(args) < 1:
-            await ctx.send(TTTRespMsg.join_missing_args())
+            await ctx.send(TTTRespMsg.Join.missing_args())
             return
         
         lobby_id = args[0]
         if not lobby_id.isdigit():
-            await ctx.send(TTTRespMsg.join_nonnumeric_lobby_id(lobby_id))
+            await ctx.send(TTTRespMsg.Join.nonnumeric_lobby_id(lobby_id))
             return
         
         lobby_id = int(lobby_id)
         status_code = TicTacToeLobbies.join(lobby_id, user_id)
 
-        if status_code == TTTStatusCode.NonexistentLobby:
-            await ctx.send(TTTRespMsg.join_nonexistent_lobby(lobby_id))
+        if status_code == TTTStatusCode.Success:
+            await ctx.send(TTTRespMsg.Join.success(lobby_id))
+        elif status_code == TTTStatusCode.NonexistentLobby:
+            await ctx.send(TTTRespMsg.Join.nonexistent_lobby(lobby_id))
         elif status_code == TTTStatusCode.InLobby:
-            await ctx.send(TTTRespMsg.join_in_lobby())
+            await ctx.send(TTTRespMsg.Join.in_lobby())
         elif status_code == TTTStatusCode.FullLobby:
-            await ctx.send(TTTRespMsg.join_full_lobby(lobby_id))
-        elif status_code == TTTStatusCode.Success:
-            await ctx.send(TTTRespMsg.join_success(lobby_id))
+            await ctx.send(TTTRespMsg.Join.full_lobby(lobby_id))
         else:
-            err_msg = ("Invalid state attained in %tictactoe join\n"
-                       f"Command used: %tictactoe join {' '.join(args)}\n"
-                       f"Invoked by: {username} ({user_id})")
-            raise Exception(err_msg)
+            raise_debug_exception(cmd,args,username,user_id)
 
     #Usage: `%tictactoe leave`
     elif cmd == 'leave':
-        pass   #TODO
+        status_code = TicTacToeLobbies.leave(user_id)
+        if status_code == TTTStatusCode.Success:
+            await ctx.send(TTTRespMsg.Leave.success())
+        elif status_code == TTTStatusCode.NotInLobby:
+            await ctx.send(TTTRespMsg.Leave.not_in_lobby())
+        else:
+            raise_debug_exception(cmd,args,username,user_id)
 
     #Usage: `%tictactoe swap`
     elif cmd == 'swap':
-        pass   #TODO
+        status_code = TicTacToeLobbies.swap(user_id)
+        if status_code == TTTStatusCode.Success:
+            pass   #TODO
 
     #Usage: `%tictactoe start`
     elif cmd == 'start':

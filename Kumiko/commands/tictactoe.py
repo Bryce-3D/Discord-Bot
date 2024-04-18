@@ -650,48 +650,41 @@ class TTTRespMsg:
         cmd_TTTStatusCode
         cmd_reason_for_error
     '''
+    
     @staticmethod
     def create_success(lobby_id:str) -> str:
-        '''Message when a user successfully creates a lobby.'''
         return (f"Created a lobby with id {lobby_id}\n"
                 f"Use `%tictactoe join {lobby_id}` to join")
 
     @staticmethod
     def create_in_lobby(username:str) -> str:
-        '''Message when a user creates a lobby while already inside one.'''
         return f"{username}, you're already in a lobby"
 
     @staticmethod
     def join_missing_args() -> str:
-        '''Message when a lobby id is not given when joining.'''
         return (f"Please put a lobby id to join\n"
                 "Sample usage: `%tictactoe join 21")
     
     @staticmethod
     def join_nonnumeric_lobby_id(lobby_id:str) -> str:
-        '''Message when a lobby id contains non-digit characters.'''
         return (f"{lobby_id} is not a valid lobby id, please use the "
                 "digits from 0 to 9 only")
     
     @staticmethod
     def join_nonexistent_lobby(lobby_id:int) -> str:
-        '''Message when trying to join a non-existent lobby.'''
         return f"No lobbies with the id {lobby_id} currently exist"
     
     @staticmethod
     def join_in_lobby() -> str:
-        '''Message when trying to join while already in some lobby.'''
         return ("You're already in a lobby. Please leave first if "
                 "you wish to join another lobby.")
     
     @staticmethod
     def join_full_lobby(lobby_id:int) -> str:
-        '''Message when trying to join a full lobby.'''
         return f"Sorry, lobby {lobby_id} is already full"
     
     @staticmethod
     def join_success(lobby_id:int) -> str:
-        '''Message when successfully joining a lobby.'''
         return f"Successfully joined lobby {lobby_id}"
     
 

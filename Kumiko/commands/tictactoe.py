@@ -665,7 +665,27 @@ class TTTRespMsg:
             return f"{ping(user_id)}, you're already in a lobby"
 
     @staticmethod
-    def join()
+    def join(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+        '''
+        Generates the message to send based on the status code from join().
+
+        Returns
+        -------
+        The message for the status code from TicTacToeLobbies.join().
+        None if a status code that TicTacToeLobbies.join() cannot 
+        return is given.
+        '''
+        if status_code == TTTStatusCode.Success:
+            return f"{ping(user_id)} successfully joined lobby {lobby_id}"
+        elif status_code == TTTStatusCode.NonexistentLobby:
+            return f"{ping(user_id)} no lobbies with the id {lobby_id} exist"
+        elif status_code == TTTStatusCode.InLobby:
+            return (f"{ping(user_id)} you're already in a lobby\n"
+                    "Please leave first if you want to join another lobby")
+        elif status_code == TTTStatusCode.FullLobby:
+            return f"{ping(user_id)} sorry lobby {lobby_id} is already full"
+        else:
+            return None
 
     class Join:
         @staticmethod
@@ -770,7 +790,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     #Usage: `%tictactoe create`
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
-        TTTRespMsg.create(lobby_id,user_id)
+        await ctx.send(TTTRespMsg.create(lobby_id,user_id))
         return
     
     #Usage: `%tictactoe join lobby_id`
@@ -781,7 +801,8 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         
         lobby_id = args[0]
         if not lobby_id.isdigit():
-            await ctx.send(TTTRespMsg.Join.nonnumeric_lobby_id(lobby_id))
+            await ctx.send((f"Please put a lobby id to join\n"
+                            "Sample usage: `%tictactoe join 21"))
             return
         
         lobby_id = int(lobby_id)

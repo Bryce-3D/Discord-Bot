@@ -18,6 +18,7 @@
 - Max0r quotes
 - Fixing code style
 - Reverse a string
+- Zalgo-ify a text
 
 
 

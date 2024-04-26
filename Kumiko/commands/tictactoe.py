@@ -1,5 +1,6 @@
 from ..bot_config import bot, commands
 from enum import IntEnum
+from _util import ping
 
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
@@ -301,7 +302,7 @@ class TicTacToeLobby:
         self.is_started = True
         return TTTStatusCode.Success
     
-    def get_turn_id(self) -> int|None:
+    def get_next_to_move(self) -> int|None:
         '''
         Returns the discord id of the next person to move.
 
@@ -479,7 +480,7 @@ class TicTacToeLobbies:
     @staticmethod
     def get_lobby_id(user_id:int) -> int|None:
         '''
-        Get the lobby id of `user_id`, or `None if the user is not in one.
+        Get the lobby id of `user_id`, or `None` if the user is not in one.
 
         Returns
         -------
@@ -489,6 +490,21 @@ class TicTacToeLobbies:
         if not TicTacToeLobbies.is_in_some_lobby(user_id):
             return None
         return TicTacToeLobbies.user_to_lobby_id[user_id]
+
+    @staticmethod
+    def get_next_to_move(lobby_id:int) -> int|None:
+        '''
+        Get the discord id of the next player to move in the specified lobby.
+
+        Returns
+        -------
+        The discord id of the next player to move in the specified lobby.
+        `None` if the user is not in some started lobby.
+        '''
+        if lobby_id not in TicTacToeLobbies.lobby_id_to_lobby:
+            return None
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        return lobby.get_next_to_move()
 
     @staticmethod
     def join(lobby_id:int, user_id:int) -> TTTStatusCode:
@@ -518,35 +534,6 @@ class TicTacToeLobbies:
         if lobby.player_count == 2:
             return TTTStatusCode.FullLobby
         lobby.add_player(user_id)
-        return TTTStatusCode.Success
-
-    @staticmethod
-    def start(user_id:int) -> TTTStatusCode:
-        '''
-        Starts the tic-tac-toe game that `user_id` is in
-
-        Parameters
-        ----------
-        user_id : int
-            The discord id of the user trying to start a game
-        
-        Returns
-        -------
-        One of the following `TTTStatusCode`s
-            `Success`      if the game was started successfully
-            `NotInLobby`   if the user is not in a lobby
-            `NotFullLobby  if the user is in a non-full lobby
-            `StartedLobby` if the user is already in a started lobby
-        '''
-        if not TicTacToeLobbies.is_in_some_lobby(user_id):
-            return TTTStatusCode.NotInLobby
-        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
-        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
-        if lobby.player_count != 2:
-            return TTTStatusCode.NotFullLobby
-        if lobby.is_started:
-            return TTTStatusCode.StartedLobby
-        lobby.start()
         return TTTStatusCode.Success
 
     @staticmethod
@@ -608,6 +595,35 @@ class TicTacToeLobbies:
         return TTTStatusCode.Success
 
     @staticmethod
+    def start(user_id:int) -> TTTStatusCode:
+        '''
+        Starts the tic-tac-toe game that `user_id` is in
+
+        Parameters
+        ----------
+        user_id : int
+            The discord id of the user trying to start a game
+        
+        Returns
+        -------
+        One of the following `TTTStatusCode`s
+            `Success`      if the game was started successfully
+            `NotInLobby`   if the user is not in a lobby
+            `NotFullLobby  if the user is in a non-full lobby
+            `StartedLobby` if the user is already in a started lobby
+        '''
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return TTTStatusCode.NotInLobby
+        lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        if lobby.player_count != 2:
+            return TTTStatusCode.NotFullLobby
+        if lobby.is_started:
+            return TTTStatusCode.StartedLobby
+        lobby.start()
+        return TTTStatusCode.Success
+
+    @staticmethod
     def place(user_id:int, r:int, c:int) -> TTTStatusCode:
         '''
         Lets the user place their mark on (r,c)
@@ -641,10 +657,6 @@ class TicTacToeLobbies:
 
 
 
-def ping(user_id:int|str) -> str:
-    '''Takes in a discord id and returns a string to ping that user'''
-    return f'<@!{user_id}>'
-
 class TTTRespMsg:
     '''
     A class to generate response messages related to `%tictactoe`.
@@ -652,12 +664,13 @@ class TTTRespMsg:
     This is functionally a namespace to neatly group everything relating to 
     making the messages for the bot to send together.
 
-    Each of the function names is one of
-        cmd_TTTStatusCode
-        cmd_reason_for_error
+    This class only handles message generation when none of the arguments are 
+    invalid. For example, `%tictactoe join b` wouldn't be handled here, since 
+    `b` isn't even an integer in the first place.
     '''
     @staticmethod
     def create(lobby_id:str|None, user_id:int) -> str:
+        '''Generates the message to send for TicTacToeLobbies.create()'''
         if lobby_id != None:
             return (f"Created a lobby with id {lobby_id} for {ping(user_id)}\n"
                     f"Use `%tictactoe join {lobby_id}` to join")
@@ -667,7 +680,7 @@ class TTTRespMsg:
     @staticmethod
     def join(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
         '''
-        Generates the message to send based on the status code from join().
+        Generates the message to send for TicTacToeLobbies.join().
 
         Returns
         -------
@@ -686,60 +699,121 @@ class TTTRespMsg:
             return f"{ping(user_id)} sorry lobby {lobby_id} is already full"
         else:
             return None
+        
+    @staticmethod
+    def leave(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+        '''
+        Generates the message to send for TicTacToeLobbies.leave().
 
-    class Join:
-        @staticmethod
-        def success(lobby_id:int) -> str:
-            return f"Successfully joined lobby {lobby_id}"
+        Returns
+        -------
+        The message for the status code from TicTacToeLobbies.leave().
+        None if a status code that TicTacToeLobbies.leave() cannot 
+        return is given.
+        '''
+        if status_code == TTTStatusCode.Success:
+            return f"{ping(user_id)} has left lobby {lobby_id}"
+        elif status_code == TTTStatusCode.NotInLobby:
+            return f"{ping(user_id)} you're not in any lobby"
+        else:
+            return None
+        
+    @staticmethod
+    def swap(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+        '''
+        Generates the message to send for TicTacToeLobbies.swap().
 
-        @staticmethod
-        def missing_args() -> str:
-            return (f"Please put a lobby id to join\n"
-                    "Sample usage: `%tictactoe join 21")
-        
-        @staticmethod
-        def nonnumeric_lobby_id(lobby_id:str) -> str:
-            return (f"{lobby_id} is not a valid lobby id, please use the "
-                    "digits from 0 to 9 only")
-        
-        @staticmethod
-        def nonexistent_lobby(lobby_id:int) -> str:
-            return f"No lobbies with the id {lobby_id} currently exist"
-        
-        @staticmethod
-        def in_lobby() -> str:
-            return ("You're already in a lobby. Please leave first if "
-                    "you wish to join another lobby.")
-        
-        @staticmethod
-        def full_lobby(lobby_id:int) -> str:
-            return f"Sorry, lobby {lobby_id} is already full"
-        
-    class Leave:
-        @staticmethod
-        def success() -> str:
-            return "Successfully left the lobby"
-        
-        @staticmethod
-        def not_in_lobby() -> str:
-            return "You are currently not in any lobby"
+        Returns
+        -------
+        The message for the status code from TicTacToeLobbies.swap().
+        None if a status code that TicTacToeLobbies.swap() cannot 
+        return is given.
+        '''
+        if status_code == TTTStatusCode.Success:
+            return (f"{ping(user_id)} successfully swapped "
+                    f"the players in lobby {lobby_id}")
+        elif status_code == TTTStatusCode.NotInLobby:
+            return f"{ping(user_id)} you're not in any lobby"
+        elif status_code == TTTStatusCode.StartedLobby:
+            return f"{ping(user_id)} you can't swap once the game has started"
+        else: 
+            return None
     
-    class Swap:
-        @staticmethod
-        def success() -> str:
-            return "Successfully swapped X and O players in your lobby"
-        
-        @staticmethod
-        def not_in_lobby() -> str:
-            return "You cannot swap places if you're not in a lobby"
+    @staticmethod
+    def start(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+        '''
+        Generates the message to send for TicTacToeLobbies.start().
+
+        Returns
+        -------
+        The message for the status code from TicTacToeLobbies.start().
+        None if a status code that TicTacToeLobbies.start() cannot 
+        return is given.
+        '''
+        if status_code == TTTStatusCode.Success:
+            to_move_id = TicTacToeLobbies.get_next_to_move(lobby_id)
+            return (f"{ping(user_id)} started lobby {lobby_id}\n"
+                    f"{ping(to_move_id)} goes first")
+        elif status_code == TTTStatusCode.NotInLobby:
+            return f"{ping(user_id)} you're not in any lobby"
+        elif status_code == TTTStatusCode.NotFullLobby:
+            return f"{ping(user_id)} your lobby isn't full yet"
+        elif status_code == TTTStatusCode.StartedLobby:
+            return f"{ping(user_id)} your lobby has already started"
+        else:
+            return None
+    
+    @staticmethod
+    def place(status_code:TTTStatusCode, lobby_id:int, user_id:int, 
+              row:int, col:int) -> str|None:
+        '''
+        Generates the message to send for TicTacToeLobbies.place().
+
+        Returns
+        -------
+        The message for the status code from TicTacToeLobbies.place().
+        None if a status code that TicTacToeLobbies.place() cannot 
+        return is given.
+        '''
+        if status_code == TTTStatusCode.Success:
+            to_move_id = TicTacToeLobbies.get_next_to_move(lobby_id)
+            lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+            return (f"{ping(user_id)} marked ({row},{col})\n"
+                    f"{ping(to_move_id)}'s turn to move\n"
+                    f"{lobby}")
+        elif status_code == TTTStatusCode.NotInLobby:
+            return f"{ping(user_id)} you're not in any lobby"
+        elif status_code == TTTStatusCode.UnstartedLobby:
+            return f"{ping(user_id)} your lobby hasn't started yet"
+        elif status_code == TTTStatusCode.NotYourTurn:
+            return f"{ping(user_id)} it's not your turn"
+        elif status_code == TTTStatusCode.CellOutOfRange:
+            return f"{ping(user_id)} that is not inside the board"
+        elif status_code == TTTStatusCode.CellUnavailable:
+            return f"{ping(user_id)} ({row},{col}) is already marked"
+        else:
+            return None
+    
+    @staticmethod
+    def view(user_id:int) -> str|None:
+        '''Generates the message to send for TicTacToeLobbies.view()'''
+        if not TicTacToeLobbies.is_in_some_lobby(user_id):
+            return f"{ping(user_id)} you're not in any lobby"
+        lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        return f"{lobby}"
+
 
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     '''
-    Main command to handle the logic of %tictactoe
+    Main command to drive the logic of %tictactoe
 
     If more arguments are provided than necessary, then the extra 
-    arguments are simply ignored when `%tictactoe` is invoked.
+    arguments are simply ignored.
+
+    The internals of this function mostly deal with parsing the arguments 
+    and sending the messages out.
     
     Arguments
     ---------
@@ -754,7 +828,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
             place
             view
     *args : str
-        The arguments passed to the given command
+        The arguments passed to the given sub-command
     '''
     def raise_debug_exception(cmd:str, args:tuple[str], 
                               username:str, user_id:int) -> None:
@@ -795,29 +869,26 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     
     #Usage: `%tictactoe join lobby_id`
     elif cmd == 'join':
+        #Lacking arguments
         if len(args) < 1:
-            await ctx.send(TTTRespMsg.Join.missing_args())
-            return
-        
-        lobby_id = args[0]
-        if not lobby_id.isdigit():
             await ctx.send((f"Please put a lobby id to join\n"
                             "Sample usage: `%tictactoe join 21"))
+            return
+        #Non-integer lobby id
+        lobby_id = args[0]
+        if not lobby_id.isdigit():
+            await ctx.send((f"{lobby_id} is not a valid lobby id, "
+                            "please use the digits from 0 to 9 only"))
             return
         
         lobby_id = int(lobby_id)
         status_code = TicTacToeLobbies.join(lobby_id, user_id)
 
-        if status_code == TTTStatusCode.Success:
-            await ctx.send(TTTRespMsg.Join.success(lobby_id))
-        elif status_code == TTTStatusCode.NonexistentLobby:
-            await ctx.send(TTTRespMsg.Join.nonexistent_lobby(lobby_id))
-        elif status_code == TTTStatusCode.InLobby:
-            await ctx.send(TTTRespMsg.Join.in_lobby())
-        elif status_code == TTTStatusCode.FullLobby:
-            await ctx.send(TTTRespMsg.Join.full_lobby(lobby_id))
-        else:
+        msg = TTTRespMsg.join(status_code, lobby_id, user_id)
+        if msg == None:
             raise_debug_exception(cmd,args,username,user_id)
+        else:
+            await ctx.send(msg)
 
     #Usage: `%tictactoe leave`
     elif cmd == 'leave':

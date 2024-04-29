@@ -15,6 +15,7 @@ class TTTStatusCode(IntEnum):
     NotYourTurn      =  8
     CellOutOfRange   =  9
     CellUnavailable  = 10
+    GameOver         = 11
 
 class TicTacToe:
     '''
@@ -118,8 +119,10 @@ class TicTacToe:
         -------
         One of the following `TTTStatusCode`s
             `Success`         if the cell was filled successfully
+                              AND does not end the game
             `CellOutOfRange`  if the provided coordinates are out of range
             `CellUnavailable` if the cell is not available
+            `GameOver`        if a player has won
         '''
         if r < 0 or r > 2 or c < 0 or c > 2:
             return TTTStatusCode.CellOutOfRange
@@ -128,6 +131,9 @@ class TicTacToe:
         #Use the parity of self.filled to determine the player
         self.board[r][c] = self.get_turn()
         self.filled += 1
+        #Check if the game is done
+        if self.get_winner() != None:
+            return TTTStatusCode.GameOver
         return TTTStatusCode.Success
     
     def restart(self) -> None:
@@ -341,12 +347,14 @@ class TicTacToeLobby:
         Returns
         -------
         One of the following `TTTStatusCode`s
-            `Success`         if the move was done successfully
+            `Success`         if the move was done successfully 
+                              AND does not end the game
             `NotInLobby`      if the user is not in the lobby
             `UnstartedLobby`  if the game hasn't started
             `NotYourTurn`     if it is not the player's turn
             `CellOutOfRange`  if the provided coordinates are out of range
             `CellUnavailable` if the spot is already filled
+            `GameOver`        if a player has won
         '''
         #User is not in the lobby (should not happen)
         if not self.is_in(id):
@@ -639,19 +647,47 @@ class TicTacToeLobbies:
         -------
         One of the following `TTTStatusCode`s
             `Success`         if the move was done successfully
+                              AND does not end the game
             `NotInLobby`      if the user is not in the lobby
             `UnstartedLobby`  if the game hasn't started
             `NotYourTurn`     if it is not the player's turn
             `CellOutOfRange`  if the provided coordinates are out of range
             `CellUnavailable` if the spot is already filled
+            `GameOver`        if a player has won
         '''
         if not TicTacToeLobbies.is_in_some_lobby(user_id):
             return TTTStatusCode.NotInLobby
         lobby_id = TicTacToeLobbies.user_to_lobby_id[user_id]
         lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
 
-        #Try to do the move and return the status code
-        return lobby.place(user_id, r, c)
+        #Try to do the move and clean up if the game ended
+        status_code = lobby.place(user_id, r, c)
+        # if status_code == TTTStatusCode.GameOver:
+        #     user_id_X = lobby.X_id
+        #     user_id_O = lobby.O_id
+        #     del TicTacToeLobbies.user_to_lobby_id[user_id_X]
+        #     del TicTacToeLobbies.user_to_lobby_id[user_id_O]
+        #     del TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        return status_code
+    
+    @staticmethod
+    def nuke(lobby_id:int) -> None:
+        '''
+        Deletes a lobby with id lobby_id
+
+        Parameters
+        ----------
+        lobby_id : int
+            The id of the lobby to be deleted
+        '''
+        lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+        user_id_X = lobby.X_id
+        user_id_O = lobby.O_id
+        if user_id_X != None:
+            del TicTacToeLobbies.user_to_lobby_id[user_id_X]
+        if user_id_O != None:
+            del TicTacToeLobbies.user_to_lobby_id[user_id_O]
+        del TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
 
 class TTTRespMsg:
     '''
@@ -790,6 +826,12 @@ class TTTRespMsg:
             return f"{ping(user_id)} that is not inside the board"
         elif status_code == TTTStatusCode.CellUnavailable:
             return f"{ping(user_id)} ({row},{col}) is already marked"
+        elif status_code == TTTStatusCode.GameOver:
+            lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
+            return ("**Game over**\n"
+                    f"{ping(user_id)} won!\n"
+                    f"\n"
+                    f"{lobby}")
         else:
             return None
     
@@ -937,7 +979,10 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         row,col = int(row),int(col)
         status_code = TicTacToeLobbies.place(user_id, row, col)
         lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        #Generate the message before nuking the lobby
         msg = TTTRespMsg.place(status_code, lobby_id, user_id, row, col)
+        if status_code == TTTStatusCode.GameOver:
+            TicTacToeLobbies.nuke(lobby_id)
         if msg == None:
             stop()
         await ctx.send(msg)

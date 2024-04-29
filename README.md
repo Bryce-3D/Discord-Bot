@@ -19,7 +19,7 @@ token='<your token here>'
 # Running the Bot Locally
 From the **project root**, run the following.
 ```bash
-python -m Kumiko.main
+python3.12 -m Kumiko.main
 ```
 
 # Running on fly.io (free tier)

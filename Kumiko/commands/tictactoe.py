@@ -366,7 +366,7 @@ class TicTacToeLobby:
 
     def __str__(self) -> str:
         '''Returns a string representation of the game state'''
-        s = f'Tic-tac-toe lobby {self.lobby_id}'
+        s = f'Tic-tac-toe lobby {self.lobby_id}\n'
         if self.X_id == None:
             s += 'There is currently no Player X\n'
         else:
@@ -381,6 +381,7 @@ class TicTacToeLobby:
             s += 'The game hasn\'t started yet'
             return s
 
+        s += f"{self.tictactoe.get_turn} to move"
         s += f'```\n{self.tictactoe}```\n'
         return s
 

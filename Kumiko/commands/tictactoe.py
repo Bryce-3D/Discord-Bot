@@ -863,7 +863,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         #Lacking arguments
         if len(args) < 1:
             await ctx.send(("Please put a lobby id to join\n"
-                            "Sample usage: `%tictactoe join 21"))
+                            "Sample usage: `%tictactoe join 21`"))
             return
         #Non-integer lobby id
         lobby_id = args[0]

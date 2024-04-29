@@ -1,5 +1,5 @@
 from time import sleep
-from ..bot_config import bot, commands
+from Kumiko.bot_config import bot, commands
 
 #Adjustable parameters of the 🍋 wave
 curve = [0,1,4,7,8,7,4,1]   #Shape of the curve

@@ -1,6 +1,6 @@
-from ..bot_config import bot, commands
+from Kumiko.bot_config import bot, commands
 from enum import IntEnum
-from _util import MEX,ping
+from Kumiko.util import MEX,ping
 
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''

@@ -1,4 +1,4 @@
-from ..bot_config import bot, commands
+from Kumiko.bot_config import bot, commands
 
 
 @bot.command()

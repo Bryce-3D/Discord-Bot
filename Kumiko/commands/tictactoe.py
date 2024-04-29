@@ -499,7 +499,7 @@ class TicTacToeLobbies:
         return lobby.get_next_to_move()
 
     @staticmethod
-    def join(lobby_id:int, user_id:int) -> TTTStatusCode:
+    def join(lobby_id:int, user_id:int, username:str) -> TTTStatusCode:
         '''
         Let `user_id` join the lobby `lobby_id`.
 
@@ -525,7 +525,7 @@ class TicTacToeLobbies:
         lobby = TicTacToeLobbies.lobby_id_to_lobby[lobby_id]
         if lobby.player_count == 2:
             return TTTStatusCode.FullLobby
-        lobby.add_player(user_id)
+        lobby.add_player(user_id, username)
         return TTTStatusCode.Success
 
     @staticmethod
@@ -873,7 +873,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
             return
         
         lobby_id = int(lobby_id)
-        status_code = TicTacToeLobbies.join(lobby_id, user_id)
+        status_code = TicTacToeLobbies.join(lobby_id, user_id, username)
 
         msg = TTTRespMsg.join(status_code, lobby_id, user_id)
         if msg == None:

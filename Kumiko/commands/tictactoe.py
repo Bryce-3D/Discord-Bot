@@ -1,6 +1,6 @@
 from ..bot_config import bot, commands
 from enum import IntEnum
-from _util import ping
+from _util import MEX,ping
 
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
@@ -408,14 +408,6 @@ class TicTacToeLobbies:
     user_to_lobby_id:dict[int,int] = {}
 
     @staticmethod
-    def MEX(d:dict|set) -> int:
-        '''Returns the MEX of a dict or set'''
-        ans = 0
-        while ans in d:
-            ans += 1
-        return ans
-
-    @staticmethod
     def is_in_some_lobby(user_id:int) -> bool:
         '''Checks if `user_id` is in a lobby'''
         return user_id in TicTacToeLobbies.user_to_lobby_id
@@ -439,7 +431,7 @@ class TicTacToeLobbies:
         '''
         if TicTacToeLobbies.is_in_some_lobby(user_id):
             return None
-        lobby_id = TicTacToeLobbies.MEX(TicTacToeLobbies.lobby_id_to_lobby)
+        lobby_id = MEX(TicTacToeLobbies.lobby_id_to_lobby)
         lobby = TicTacToeLobby(lobby_id, X_id=user_id)
         TicTacToeLobbies.lobby_id_to_lobby[lobby_id] = lobby
         TicTacToeLobbies.user_to_lobby_id[user_id] = lobby_id
@@ -654,8 +646,6 @@ class TicTacToeLobbies:
 
         #Try to do the move and return the status code
         return lobby.place(user_id, r, c)
-
-
 
 class TTTRespMsg:
     '''
@@ -887,8 +877,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         msg = TTTRespMsg.join(status_code, lobby_id, user_id)
         if msg == None:
             raise_debug_exception(cmd,args,username,user_id)
-        else:
-            await ctx.send(msg)
+        await ctx.send(msg)
 
     #Usage: `%tictactoe leave`
     elif cmd == 'leave':

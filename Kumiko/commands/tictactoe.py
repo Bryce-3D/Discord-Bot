@@ -414,7 +414,7 @@ class TicTacToeLobbies:
         return user_id in TicTacToeLobbies.user_to_lobby_id
 
     @staticmethod
-    def lobby_create(user_id:int) -> int|None:
+    def lobby_create(user_id:int, username:str) -> int|None:
         '''
         Create a lobby for `user_id`.
 
@@ -424,6 +424,8 @@ class TicTacToeLobbies:
         ----------
         user_id : int
             The discord id of the user who is creating a new lobby.
+        username : str
+            The server nickname of the user who is creating a new lobby.
         
         Returns
         -------
@@ -433,7 +435,7 @@ class TicTacToeLobbies:
         if TicTacToeLobbies.is_in_some_lobby(user_id):
             return None
         lobby_id = MEX(TicTacToeLobbies.lobby_id_to_lobby)
-        lobby = TicTacToeLobby(lobby_id, X_id=user_id)
+        lobby = TicTacToeLobby(lobby_id, X_id=user_id, X_name=username)
         TicTacToeLobbies.lobby_id_to_lobby[lobby_id] = lobby
         TicTacToeLobbies.user_to_lobby_id[user_id] = lobby_id
         return lobby_id
@@ -510,6 +512,8 @@ class TicTacToeLobbies:
             The lobby id of the lobby being joined
         user_id : int
             The discord id of the user who is joining the lobby
+        username : str
+            The server nickname of the user who is creating a new lobby.
         
         Returns
         -------

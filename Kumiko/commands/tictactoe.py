@@ -526,6 +526,7 @@ class TicTacToeLobbies:
         if lobby.player_count == 2:
             return TTTStatusCode.FullLobby
         lobby.add_player(user_id, username)
+        TicTacToeLobbies.user_to_lobby_id[user_id] = lobby_id
         return TTTStatusCode.Success
 
     @staticmethod

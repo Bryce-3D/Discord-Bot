@@ -1,5 +1,7 @@
 #File to store common utility functions for Kumiko
 
+from __future__ import annotations
+
 def MEX(d:dict|set) -> int:
     '''Returns the MEX of a dict or set'''
     ans = 0

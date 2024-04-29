@@ -1,3 +1,4 @@
+from __future__ import annotations
 from Kumiko.bot_config import bot, commands
 from enum import IntEnum
 from Kumiko.util import MEX,ping

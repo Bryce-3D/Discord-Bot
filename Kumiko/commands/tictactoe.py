@@ -691,7 +691,8 @@ class TTTRespMsg:
             return None
         
     @staticmethod
-    def leave(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+    def leave(status_code:TTTStatusCode, lobby_id:int|None, 
+              user_id:int) -> str|None:
         '''
         Generates the message to send for TicTacToeLobbies.leave().
 
@@ -709,7 +710,8 @@ class TTTRespMsg:
             return None
         
     @staticmethod
-    def swap(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+    def swap(status_code:TTTStatusCode, lobby_id:int|None, 
+             user_id:int) -> str|None:
         '''
         Generates the message to send for TicTacToeLobbies.swap().
 
@@ -730,7 +732,8 @@ class TTTRespMsg:
             return None
     
     @staticmethod
-    def start(status_code:TTTStatusCode, lobby_id:int, user_id:int) -> str|None:
+    def start(status_code:TTTStatusCode, lobby_id:int|None, 
+              user_id:int) -> str|None:
         '''
         Generates the message to send for TicTacToeLobbies.start().
 
@@ -754,7 +757,7 @@ class TTTRespMsg:
             return None
     
     @staticmethod
-    def place(status_code:TTTStatusCode, lobby_id:int, user_id:int, 
+    def place(status_code:TTTStatusCode, lobby_id:int|None, user_id:int, 
               row:int, col:int) -> str|None:
         '''
         Generates the message to send for TicTacToeLobbies.place().
@@ -785,7 +788,7 @@ class TTTRespMsg:
             return None
     
     @staticmethod
-    def view(user_id:int) -> str|None:
+    def view(user_id:int) -> str:
         '''Generates the message to send for TicTacToeLobbies.view()'''
         if not TicTacToeLobbies.is_in_some_lobby(user_id):
             return f"{ping(user_id)} you're not in any lobby"
@@ -851,14 +854,15 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     #Usage: `%tictactoe create`
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
-        await ctx.send(TTTRespMsg.create(lobby_id, user_id))
+        msg = TTTRespMsg.create(lobby_id, user_id)
+        await ctx.send(msg)
         return
     
     #Usage: `%tictactoe join lobby_id`
     elif cmd == 'join':
         #Lacking arguments
         if len(args) < 1:
-            await ctx.send((f"Please put a lobby id to join\n"
+            await ctx.send(("Please put a lobby id to join\n"
                             "Sample usage: `%tictactoe join 21"))
             return
         #Non-integer lobby id
@@ -894,18 +898,54 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         msg = TTTRespMsg.swap(status_code, lobby_id, user_id)
         if msg == None:
             stop()
+        await ctx.send(msg)
+        return
 
     #Usage: `%tictactoe start`
     elif cmd == 'start':
-        pass   #TODO
+        status_code = TicTacToeLobbies.start(user_id)
+        lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        msg = TTTRespMsg.start(status_code, lobby_id, user_id)
+        if msg == None:
+            stop()
+        await ctx.send(msg)
+        return
 
     #Usage: `%tictactoe place row col`
     elif cmd == 'place':
-        pass   #TODO
+        #Lacking arguments
+        if len(args) < 2:
+            msg = ("Please put what row and column you want to place in\n"
+                   "Sample usage: `%tictactoe place 0 1")
+            await ctx.send(msg)
+            return
+        #Non-integer row or col
+        row,col = args[0],args[1]
+        if not (row.isdigit() and col.isdigit()):
+            msg = (f"At least one of {row}, {col} is not an integer, "
+                   "please use integers from 0 to 2 only\n"
+                   "Sample usage: `%tictactoe place 0 1")
+            await ctx.send(msg)
+            return
+
+        row,col = int(row),int(col)
+        status_code = TicTacToeLobbies.place(user_id, row, col)
+        lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        msg = TTTRespMsg.place(status_code, lobby_id, user_id, row, col)
+        if msg == None:
+            stop()
+        await ctx.send(msg)
+        return
 
     #Usage: `%tictactoe view`
     elif cmd == 'view':
-        pass   #TODO
+        msg = TTTRespMsg.view(user_id)
+        await ctx.send(msg)
     
+    #Invalid tic-tac-toe subcommand given
     else:
-        pass   #TODO
+        msg = (f"{cmd} is not a valid tictactoe subcommand\n"
+               f"Please use %help for more info")
+        await ctx.send(msg)
+
+

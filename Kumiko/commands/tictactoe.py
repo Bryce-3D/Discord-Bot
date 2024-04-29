@@ -794,6 +794,10 @@ class TTTRespMsg:
         return f"{lobby}"
 
 
+#TODO
+#Make the debug message also log in my personal server for easy access
+#inside stop().
+
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     '''
@@ -820,32 +824,25 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     *args : str
         The arguments passed to the given sub-command
     '''
-    def raise_debug_exception(cmd:str, args:tuple[str], 
-                              username:str, user_id:int) -> None:
+    def debug_msg() -> str:
         '''
-        Helper function to raise an exception in invalid states.
+        Generates a debug message to give information.
 
-        Arguments
-        ---------
-        cmd : str
-            The called tictactoe command that caused the invalid state
-        args : tuple[str]
-            The arguments passed to the tictactoe command
-        username : str
-            The discord name (server profile) of the person who caused 
-            the invalid state
-        user_id : int
-            The discord id of the person who caused the invalid state
-
-        Raises
-        ------
-        An exception with a message containing information on how the 
-        invalid state was triggered.
+        Returns
+        -------
+        A message containing information on how the invalid state 
+        was triggered.
         '''
-        err_msg = ("Invalid state attained in %tictactoe\n"
-                   f"Command used: %tictactoe {cmd} {' '.join(args)}\n"
-                   f"Invoked by: {username} ({user_id})")
-        raise Exception(err_msg)
+        msg = ("Invalid state attained in %tictactoe\n"
+               f"Command used: %tictactoe {cmd} {' '.join(args)}\n"
+               f"Invoked by: {username} ({user_id})")
+        return msg
+    
+    async def stop() -> None:
+        '''Stops the function when an invalid state happens.'''
+        msg = debug_msg()
+        await ctx.send(msg)
+        raise Exception(msg)
 
     cmd = cmd.lower()
     user_id:int = ctx.author.id
@@ -854,7 +851,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     #Usage: `%tictactoe create`
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
-        await ctx.send(TTTRespMsg.create(lobby_id,user_id))
+        await ctx.send(TTTRespMsg.create(lobby_id, user_id))
         return
     
     #Usage: `%tictactoe join lobby_id`
@@ -876,24 +873,27 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
 
         msg = TTTRespMsg.join(status_code, lobby_id, user_id)
         if msg == None:
-            raise_debug_exception(cmd,args,username,user_id)
+            stop()
         await ctx.send(msg)
+        return
 
     #Usage: `%tictactoe leave`
     elif cmd == 'leave':
         status_code = TicTacToeLobbies.leave(user_id)
-        if status_code == TTTStatusCode.Success:
-            await ctx.send(TTTRespMsg.Leave.success())
-        elif status_code == TTTStatusCode.NotInLobby:
-            await ctx.send(TTTRespMsg.Leave.not_in_lobby())
-        else:
-            raise_debug_exception(cmd,args,username,user_id)
+        lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        msg = TTTRespMsg.leave(status_code, lobby_id, user_id)
+        if msg == None:
+            stop()
+        await ctx.send(msg)
+        return
 
     #Usage: `%tictactoe swap`
     elif cmd == 'swap':
         status_code = TicTacToeLobbies.swap(user_id)
-        if status_code == TTTStatusCode.Success:
-            pass   #TODO
+        lobby_id = TicTacToeLobbies.get_lobby_id(user_id)
+        msg = TTTRespMsg.swap(status_code, lobby_id, user_id)
+        if msg == None:
+            stop()
 
     #Usage: `%tictactoe start`
     elif cmd == 'start':

@@ -860,7 +860,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     #Usage: `%tictactoe create`
     if cmd == 'create':
         lobby_id = TicTacToeLobbies.lobby_create(user_id)
-        msg = TTTRespMsg.create(lobby_id, user_id)
+        msg = TTTRespMsg.create(lobby_id, user_id, username)
         await ctx.send(msg)
         return
     

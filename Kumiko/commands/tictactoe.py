@@ -381,7 +381,7 @@ class TicTacToeLobby:
             s += 'The game hasn\'t started yet'
             return s
 
-        s += f"{self.tictactoe.get_turn} to move"
+        s += f"{self.tictactoe.get_turn()} to move"
         s += f'```\n{self.tictactoe}```\n'
         return s
 

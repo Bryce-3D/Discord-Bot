@@ -95,14 +95,8 @@ class TicTacToe:
             return 'O'
         return None
 
+    @property
     def get_turn(self) -> str:
-        '''
-        Returns whose turn it currently is
-
-        Returns
-        -------
-        'X' is it is player X's turn, 'O' otherwise
-        '''
         return 'X' if self.filled%2 == 0 else 'O'
 
     def place(self, r:int, c:int) -> TTTStatusCode:
@@ -130,7 +124,7 @@ class TicTacToe:
         if self.board[r][c] != ' ':
             return TTTStatusCode.CellUnavailable
         #Use the parity of self.filled to determine the player
-        self.board[r][c] = self.get_turn()
+        self.board[r][c] = self.get_turn
         self.filled += 1
         #Check if the game is done
         if self.get_winner() != None:
@@ -320,7 +314,7 @@ class TicTacToeLobby:
         '''
         if not self.is_started:
             return None
-        if self.tictactoe.get_turn() == 'X':
+        if self.tictactoe.get_turn == 'X':
             return self.X_id
         else:
             return self.O_id
@@ -364,10 +358,10 @@ class TicTacToeLobby:
             return TTTStatusCode.UnstartedLobby
 
         #O moved during X's turn
-        if self.tictactoe.get_turn() == 'X' and self.O_id == id:
+        if self.tictactoe.get_turn == 'X' and self.O_id == id:
             return TTTStatusCode.NotYourTurn
         #X moved during O's turn
-        if self.tictactoe.get_turn() == 'O' and self.X_id == id:
+        if self.tictactoe.get_turn == 'O' and self.X_id == id:
             return TTTStatusCode.NotYourTurn
         
         #Try to do the move and return the status code
@@ -390,7 +384,7 @@ class TicTacToeLobby:
             s += 'The game hasn\'t started yet'
             return s
 
-        s += f"{self.tictactoe.get_turn()} to move"
+        s += f"{self.tictactoe.get_turn} to move"
         s += f'```\n{self.tictactoe}```\n'
         return s
 

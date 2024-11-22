@@ -43,29 +43,13 @@ class TicTacToe:
             [' ' for c in range(3)] for r in range(3)
         ]
         self.filled = 0
+
+    @property
+    def turn(self) -> str:
+        return 'X' if self.filled%2 == 0 else 'O'
     
-    def win_check(self, player:str) -> bool:
-        '''
-        Checks if the specified player has won the game.
-
-        Parameters
-        ----------
-        player : str
-            The specified player. either 'X' or 'O'
-
-        Returns
-        -------
-        True if player has a line on the board, False otherwise
-
-        Raises
-        ------
-        Exception() if the player is not `X` or `O`.
-        '''
-        if player not in {'X','O'}:
-            err_msg  = f'TicTacToe.win_check({player}) '
-            err_msg += 'is an invalid function call'
-            raise Exception(err_msg)
-        
+    def _win_check(self, player:str) -> bool:
+        '''Checks if the specified player ('X' or 'O') has won the game'''
         #Check rows
         for r in range(3):
             if self.board[r][0] == self.board[r][1] == self.board[r][2] == player:
@@ -82,34 +66,16 @@ class TicTacToe:
         return False
     
     def get_winner(self) -> str|None:
-        '''
-        Gets the winner of the Tic-Tac-Toe game.
-
-        Returns
-        -------
-        'X' or 'O' if one of them has won the game.
-        `None` if no one has won yet.
-        '''
-        if self.win_check('X'):
+        '''Returns the winner (X or O) or `None` if neither has won'''
+        if self._win_check('X'):
             return 'X'
-        if self.win_check('O'):
+        if self._win_check('O'):
             return 'O'
         return None
 
-    @property
-    def turn(self) -> str:
-        return 'X' if self.filled%2 == 0 else 'O'
-
     def place(self, r:int, c:int) -> TTTStatusCode:
         '''
-        Place an X or O in (r,c) depending on whose turn it is
-        
-        Parameters
-        ----------
-        r : int
-            The row number of the cell being filled
-        c : int
-            The col number of the cell being filled
+        Place an X or O in (r,c) depending on whose turn it is.
         
         Returns
         -------

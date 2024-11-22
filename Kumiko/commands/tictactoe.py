@@ -388,6 +388,7 @@ class TicTacToeLobbies:
         '''
         Create a lobby for `user_id`.
         The creator for the lobby goes first (X) by default.
+        
         Parameters
         ----------
         user_id : int

@@ -384,24 +384,22 @@ class TicTacToeLobbies:
         return user_id in TicTacToeLobbies.user_to_lobby_id
 
     @staticmethod
-    def lobby_create(user:discord.User) -> int|None:
+    def lobby_create(user_id:int, username:str) -> int|None:
         '''
-        Create a lobby for `user`.
-
-        The creator of the lobby goes first (X) by default.
-
+        Create a lobby for `user_id`.
+        The creator for the lobby goes first (X) by default.
         Parameters
         ----------
-        user : discord.User
-            The user who is creating a new lobby.
+        user_id : int
+            The discord id of the user who is creating a new lobby.
+        username : str
+            The server nickname of the user who is creating a new lobby.
         
         Returns
         -------
         The lobby id of the newly generated lobby or 
         `None` if the user is already in a lobby.
         '''
-        user_id = user.id
-        username = user.display_name
         if TicTacToeLobbies.is_in_some_lobby(user_id):
             return None
         lobby_id = MEX(TicTacToeLobbies.lobby_id_to_lobby)
@@ -858,7 +856,6 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         raise Exception(msg)
 
     cmd = cmd.lower()
-    user:discord.User = ctx.author
     user_id:int = ctx.author.id
     username:str = ctx.author.display_name
 

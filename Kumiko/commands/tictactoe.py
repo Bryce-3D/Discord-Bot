@@ -163,42 +163,24 @@ class TicTacToeLobby:
         return ans
 
     def is_in(self, id:int) -> bool:
-        '''
-        Checks if a given user is in the lobby.
-
-        Parameters
-        ----------
-        id : int
-            The discord id of the user being checked.
-        
-        Returns
-        -------
-        True if the user is in the lobby, False otherwise.
-        '''
+        '''Checks if a given user is in the lobby'''
         return self.X_id == id or self.O_id == id
 
     def add_player(self, id:int, name:str) -> TTTStatusCode:
         '''
         Adds a player to the game.
 
-        Parameters
-        ----------
-        id : int
-            The discord id of the user being added
-        name : str
-            The discord name of the user being added
-
         Returns
         -------
         One of the following `TTTStatusCode`s
             `Success`   if the player was added successfully
-            `FullLobby` if the lobby is already full
             `InLobby`   if the player is already in the lobby
+            `FullLobby` if the lobby is already full
         '''
-        if self.player_count == 2:
-            return TTTStatusCode.FullLobby
         if self.is_in(id):
             return TTTStatusCode.InLobby
+        if self.player_count == 2:
+            return TTTStatusCode.FullLobby
         if self.X_id == None:
             self.X_id = id
             self.X_name = name
@@ -388,7 +370,7 @@ class TicTacToeLobbies:
         '''
         Create a lobby for `user_id`.
         The creator for the lobby goes first (X) by default.
-        
+
         Parameters
         ----------
         user_id : int

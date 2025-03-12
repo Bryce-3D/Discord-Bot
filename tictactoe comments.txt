@@ -1,0 +1,48 @@
+* `self.filled` has no purpose other than keep track of turns and in a separate method
+ - instead replace with `self.is_X_turn` or similar turn tracker directly
+* checking valid input in `win_check`???
+ - if you know how you are using the functions you shouldn't really need to double check it
+ - also, it seems to be an internal function, and `get_winner` is the actual public method
+* opt for Player string enum
+ - clearer for if you want to reread or maintain the code in the future IMO
+ - also IDEs can check and is happier for you if you do that
+* make `get_turn` a property
+ - functionally similar
+* variable names (especially parameters) in general 👁️
+* using __str__ for not necessarily the object as a string ? questionable choice
+ - just define methods for `[thing]_to_string()`, its clearer
+* documentation where it is clear / would be clear with some of the changes above
+ - and your comments holy hell some of these absolutely do not need it help
+* reduce some of the names, since this is understood as all under `tictactoe.py`
+* merge TTTLobby and TTTLobbies
+ - redundant / out of place `place` and `get_next_to_move` methods
+ - `join`, `leave`, `swap`, etc. can be managed by getting lobby first then handling (and also redundant)
+* dataclasses, dataclasses cool and fun
+* create the game during `start()`, not initialization of the lobby
+* `player_count` is not so much relevant other than checking fullness or emptiness of a lobby
+ - create `is_full` and `is_empty` methods, clearer and easier to use and manage
+* track `user` instead of `user_id` and `user_name` separately
+ - more succinct and useful
+* reset of TicTacToe object not really relevant, opt to reinstantiate object instead
+ - easier to handle (no need to always keep track of the variables needed to be reset)
+ - Lobby only needs to check if `tictactoe` is None to see if the game is started or not (`is_started`)
+* potentially unclear behavior of `lobby_create` (`create_lobby`), returning `None` if player is already in some
+  lobby
+ - IMO better if it returns (status, lobby*) instead, since you already have statuses, and its clearer perhaps
+   in intention and return value of the method
+ - moreover, you can 🤔 modify the response if you return the lobby the user is already on instead of
+   a `None`, and say "You are already in Lobby [lobby_id] already" or something like so
+ - also consistent with return of `lobby_destroy` (`destroy_lobby`) being a status code
+* `get_lobby_id` exists but for some reason you dont use it in some parts??
+* `lobby_destroy` and `nuke` ???
+ - let lobby destroy itself with its own method
+ - `lobby_destroy` directly from above method, instead of referring to user
+* confusing TTTRespMsg structure overall ???
+ - why can the returns be `None` <:mafuyuidgi:1202515179284201472>
+> im guessing so you can check whether there was no response message / unhandled status code? id rather have
+    it just throw an exception at me but because im implementing it directly with a dictionary
+ - handling of `view` lobby shouldn't really be in the response class now should it
+* recommend using cogs, but if you want to hook commands directly into bot that's fine too
+ - my command groups kinda polluting namespace with its function names, could go `_create` etc and rename it
+   though, up to you for that
+* handle `nuke` on game over within the lobby itself

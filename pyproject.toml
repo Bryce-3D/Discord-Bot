@@ -7,7 +7,10 @@ authors = [
     { name = "Homura", email = "bryceainsleysanchez@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "discord>=2.3.2",
+    "requests>=2.34.2",
+]
 
 [project.scripts]
 discord-bot = "discord_bot:main"

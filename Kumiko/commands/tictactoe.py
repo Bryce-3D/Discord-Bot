@@ -5,6 +5,8 @@ from enum import IntEnum
 from Kumiko.bot_config import bot
 from Kumiko.util import MEX,ping
 
+# TODO: Make lobbies tied to channels rather than using a lobby id
+
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
     Success          =  0

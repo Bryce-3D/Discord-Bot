@@ -12,6 +12,15 @@ from Kumiko.bot_config import bot
 from Kumiko.commands import *
 from Kumiko.misc import testing
 
+'''
+TODO
+Register commands explicitly here instead of relying on the import
+Do one of the two
+- Use cogs https://discordpy.readthedocs.io/en/stable/ext/commands/cogs.html
+- Change @bot.command() to @discord.ext.commands.command() and do 
+  discord.ext.commands.Bot.add_command(function_with_commands_decorator)
+'''
+
 
 @bot.event
 async def on_ready():

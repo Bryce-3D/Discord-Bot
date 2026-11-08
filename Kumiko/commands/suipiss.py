@@ -1,4 +1,6 @@
-from Kumiko.bot_config import bot, commands
+from discord.ext import commands
+
+from Kumiko.bot_config import bot
 
 
 @bot.command()

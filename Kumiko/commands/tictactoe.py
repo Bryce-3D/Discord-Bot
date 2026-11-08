@@ -1,8 +1,14 @@
-from __future__ import annotations
 import discord
-from Kumiko.bot_config import bot, commands
+from discord.ext import commands
 from enum import IntEnum
+
+from Kumiko.bot_config import bot
 from Kumiko.util import MEX,ping
+
+# TODO: Make lobbies tied to channels rather than using a lobby id
+# TODO: Clean out unnecesary comments
+# TODO: Go over suggestions in tictactoe comments.txt and delete that file when done
+# TODO: Bug fixes obv
 
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''

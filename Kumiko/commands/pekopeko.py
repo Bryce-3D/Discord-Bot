@@ -1,6 +1,7 @@
 import random
-from typing import Optional
-from Kumiko.bot_config import bot, commands
+from discord.ext import commands
+
+from Kumiko.bot_config import bot
 
 
 
@@ -11,7 +12,7 @@ for i in range(3):
 arr = ['↗️', '↘️']
 
 @bot.command()
-async def pekopeko(ctx:commands.Context, min_ha:Optional[int]=None, max_ha:Optional[int]=None) -> None:
+async def pekopeko(ctx:commands.Context, min_ha:int|None=None, max_ha:int|None=None) -> None:
     '''
     Channel your inner peko laugh. 
     Number of ha's is 

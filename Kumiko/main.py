@@ -3,11 +3,6 @@ Credits to
     https://github.com/Rapptz/discord.py/blob/v1.7.3/examples/basic_bot.py
 for being used as reference code during the early stages of development.
 '''
-import asyncio
-import json
-from requests import get as get_url
-from datetime import datetime as dt
-
 import discord
 from discord.ext import commands
 
@@ -17,10 +12,15 @@ from Kumiko.bot_config import bot
 from Kumiko.commands import *
 from Kumiko.misc import testing
 
+'''
+TODO
+Register commands explicitly here instead of relying on the import
+Do one of the two
+- Use cogs https://discordpy.readthedocs.io/en/stable/ext/commands/cogs.html
+- Change @bot.command() to @discord.ext.commands.command() and do 
+  discord.ext.commands.Bot.add_command(function_with_commands_decorator)
+'''
 
-#https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh
-#https://stackoverflow.com/questions/71959420/client-init-missing-1-required-keyword-only-argument-intents
-client = discord.Client(intents=discord.Intents.default())
 
 @bot.event
 async def on_ready():

@@ -3,11 +3,6 @@ Credits to
     https://github.com/Rapptz/discord.py/blob/v1.7.3/examples/basic_bot.py
 for being used as reference code during the early stages of development.
 '''
-import asyncio
-import json
-from requests import get as get_url
-from datetime import datetime as dt
-
 import discord
 from discord.ext import commands
 

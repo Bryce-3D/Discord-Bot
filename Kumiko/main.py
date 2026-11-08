@@ -13,10 +13,6 @@ from Kumiko.commands import *
 from Kumiko.misc import testing
 
 
-#https://stackoverflow.com/questions/62544309/why-client-emojis-newer-version-of-client-get-all-emojis-returns-empy-list-wh
-#https://stackoverflow.com/questions/71959420/client-init-missing-1-required-keyword-only-argument-intents
-client = discord.Client(intents=discord.Intents.default())
-
 @bot.event
 async def on_ready():
     print(f'Running the bot {bot.user.name}')

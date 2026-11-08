@@ -1,6 +1,8 @@
 import random
+from discord.ext import commands
 from typing import Optional
-from Kumiko.bot_config import bot, commands
+
+from Kumiko.bot_config import bot
 
 
 

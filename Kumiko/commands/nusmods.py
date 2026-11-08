@@ -1,7 +1,9 @@
 import discord
-from requests import get as get_url
 from datetime import datetime as dt
-from Kumiko.bot_config import bot, commands
+from discord.ext import commands
+from requests import get as get_url
+
+from Kumiko.bot_config import bot
 
 
 

@@ -101,8 +101,8 @@ async def nusmods(ctx:commands.Context, mod_code:str=None,
     def curr_ay() -> str:
         '''Generates the AY string for the current AY'''
         now = dt.now()
-        y = now.year    #y = int(now.strftime('%Y'))
-        m = now.month   #m = int(now.strftime('%m'))
+        y = now.year
+        m = now.month
         if m <= 6:
             return f'{y-1}-{y}'
         else:

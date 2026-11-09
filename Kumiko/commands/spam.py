@@ -1,6 +1,8 @@
-import random
 import asyncio
-from Kumiko.bot_config import bot, commands
+import random
+from discord.ext import commands
+
+from Kumiko.bot_config import bot
 
 
 

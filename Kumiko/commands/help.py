@@ -25,6 +25,7 @@ async def help(ctx:commands.Context, cmd:str=None) -> None:
     If cmd is provided, sends a detailed description of how to use %cmd
     '''
 
+    # TODO: Make the prefix % not hardcoded and import from bot_config.py instead
     if cmd == None:
         s  = 'Hi! My prefix is `%`\n'
         s += 'Use `%help cmd` for more detailed information on a specific command'
@@ -34,6 +35,7 @@ async def help(ctx:commands.Context, cmd:str=None) -> None:
             color = 0xff6d01
         )
 
+        # TODO: Make these imported from their respective command instead of stored here
         s  = '> `%choose` - Choose an option from a given list of items\n'
         s += '> `%help` - Used to display info about commands\n'
         s += '> `%imo` - Used to send the link to a country\'s IMO page\n'
@@ -55,4 +57,5 @@ async def help(ctx:commands.Context, cmd:str=None) -> None:
         await ctx.send(f'I don\'t have any command called `{cmd}`')
         return
     
+    # TODO: Change this so you do %lemon help instead of %help lemon
     await ctx.send('TODO')

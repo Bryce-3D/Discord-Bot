@@ -1,7 +1,7 @@
 # Discord-Bot
 Repository for my discord bot Oumae Kumiko </br>
 Developed using Python 3.12 </br>
-Uses [uv](https://docs.astral.sh/uv/getting-started/first-steps/) for Python 
+Uses [uv](https://docs.astral.sh/uv/getting-started/) for Python 
 package management </br>
 Guides for installing uv and adding Python versions to uv can be found 
 [here](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) and 

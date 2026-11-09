@@ -1,17 +1,15 @@
 # Discord-Bot
 Repository for my discord bot Oumae Kumiko </br>
-Requires at least **Python 3.10** to run properly due to the use of built in </br>
-union type hinting (such as `int|None`) in some files.
+Developed using Python 3.12 </br>
+Uses [uv](https://docs.astral.sh/uv/getting-started/first-steps/) for Python 
+package management </br>
+Guides for installing uv and adding Python versions to uv can be found 
+[here](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) and 
+[here](https://docs.astral.sh/uv/guides/install-python/#installing-a-specific-version)
+respectively </br>
 
-# Installation
-```bash
-python3.12 -m venv venv
-source venv/bin/activate
-python3.12 -m pip install discord requests
-```
-
-# Adding of Token
-From the **project root**, make a new file `Token.py` with one line in it.
+# Adding Your Bot Token
+In the **project root**, make a new file `Token.py` with the token.
 ```py
 token='<your token here>'
 ```
@@ -19,12 +17,13 @@ token='<your token here>'
 # Running the Bot Locally
 From the **project root**, run the following.
 ```bash
-python3.12 -m Kumiko.main
+uv run -m Kumiko.main
 ```
 
 # Running on fly.io (free tier)
 First setup a fly.io account and input your credit card information. </br>
-Then let your terminal log into your fly.io account.
+Then let your terminal log into your fly.io account. </br>
+**NOTE:** If you exceed the free tier, you will be charged for it.
 
 From the **project root**, run the following
 ```bash
@@ -37,8 +36,10 @@ flyctl launch
 #Visit your newly deployed app at ...
 fly m destroy one_of_the_two_machine_ids -a oumae-kumiko-bot --force
 ```
-The destruction of one of the machines on fly.io is to prevent messages from being sent twice, </br>
-as explained in [this thread](https://community.fly.io/t/how-to-only-have-one-machine-running-at-once/13914/2)
+The destruction of one of the machines on fly.io is to prevent messages from 
+being sent twice, as explained in 
+[this thread](https://community.fly.io/t/how-to-only-have-one-machine-running-at-once/13914/2)
+
 
 
 In loving memory of the file `its-so-beautiful-let-me-save-it.json`

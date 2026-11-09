@@ -9,6 +9,7 @@ from Kumiko.util import MEX,ping
 # TODO: Clean out unnecesary comments
 # TODO: Go over suggestions in tictactoe comments.txt and delete that file when done
 # TODO: Bug fixes obv
+# TODO: Raise exceptions instead of returning status codes (?)
 
 '''
 Buglist
@@ -122,6 +123,8 @@ class TicTacToe:
              f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n')
         return s
 
+# TODO: Make an unstarted lobby have self.tictactoe = None and delete 
+#  self.is_started or make it an @property
 class Lobby:
     '''
     A class to represent a tic-tac-toe game lobby.
@@ -276,6 +279,7 @@ class Lobby:
 
     def reset(self) -> None:
         '''Resets the state of the game while keeping the players in'''
+        # TODO: Deprecate restart() and reinitialize/set to None
         self.tictactoe.restart()
         self.is_started = False
     

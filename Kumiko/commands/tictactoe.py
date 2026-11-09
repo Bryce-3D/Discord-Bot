@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 
 from Kumiko.bot_config import bot
 from Kumiko.util import MEX,ping
@@ -24,6 +24,10 @@ class TTTStatusCode(IntEnum):
     CellOutOfRange   =  9
     CellUnavailable  = 10
     GameOver         = 11
+
+class TTTPlayerStr(StrEnum):
+    P1 = 'X'
+    P2 = 'O'
 
 class TicTacToe:
     '''

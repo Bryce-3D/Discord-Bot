@@ -12,7 +12,8 @@ from Kumiko.util import MEX,ping
 
 '''
 Buglist
-- %tictactoe leave raises "Cannooot send an empty message"
+- %tictactoe leave raises "Cannot send an empty message"
+- Properly end tied games
 '''
 
 class TTTStatusCode(IntEnum):
@@ -30,7 +31,7 @@ class TTTStatusCode(IntEnum):
     CellUnavailable  = 10
     GameOver         = 11
 
-class TTTPlayerStr(StrEnum):
+class TTTPlayer(StrEnum):
     P1 = 'X'
     P2 = 'O'
 
@@ -48,22 +49,15 @@ class TicTacToe:
     Attributes
     ----------
     board : list[list[str]]
-        The 3x3 tic-tac-toe board
-    filled : int
-        The number of cells in the board filled so far.
+    is_P1_turn : bool
     '''
     def __init__(self):
-        '''Initialize a game of tic-tac-toe'''
         self.board:list[list[str]] = [
             [' ' for c in range(3)] for r in range(3)
         ]
-        self.filled = 0
-
-    @property
-    def turn(self) -> str:
-        return 'X' if self.filled%2 == 0 else 'O'
+        self.is_P1_turn:bool = True
     
-    def _win_check(self, player:str) -> bool:
+    def _win_check(self, player:TTTPlayer) -> bool:
         '''Checks if the specified player ('X' or 'O') has won the game'''
         #Check rows
         for r in range(3):
@@ -80,18 +74,16 @@ class TicTacToe:
             return True
         return False
     
-    def get_winner(self) -> str|None:
-        '''Returns the winner (X or O) or `None` if neither has won'''
-        if self._win_check('X'):
-            return 'X'
-        if self._win_check('O'):
-            return 'O'
+    def get_winner(self) -> TTTPlayer|None:
+        '''Returns the winner or `None` if neither has won'''
+        if self._win_check(TTTPlayer.P1):
+            return TTTPlayer.P1
+        if self._win_check(TTTPlayer.P2):
+            return TTTPlayer.P2
         return None
 
     def place(self, r:int, c:int) -> TTTStatusCode:
         '''
-        Place an X or O in (r,c) depending on whose turn it is.
-        
         Returns
         -------
         One of the following `TTTStatusCode`s
@@ -105,10 +97,10 @@ class TicTacToe:
             return TTTStatusCode.CellOutOfRange
         if self.board[r][c] != ' ':
             return TTTStatusCode.CellUnavailable
-        #Use the parity of self.filled to determine the player
-        self.board[r][c] = self.turn
-        self.filled += 1
-        #Check if the game is done
+
+        self.board[r][c] = TTTPlayer.P1 if self.is_P1_turn else TTTPlayer.P2
+        self.is_P1_turn = not self.is_P1_turn
+
         if self.get_winner() != None:
             return TTTStatusCode.GameOver
         return TTTStatusCode.Success
@@ -277,7 +269,7 @@ class TicTacToeLobby:
         '''
         if not self.is_started:
             return None
-        if self.tictactoe.turn == 'X':
+        if self.tictactoe.is_P1_turn:
             return self.X_id
         else:
             return self.O_id
@@ -321,10 +313,10 @@ class TicTacToeLobby:
             return TTTStatusCode.UnstartedLobby
 
         #O moved during X's turn
-        if self.tictactoe.turn == 'X' and self.O_id == id:
+        if self.tictactoe.is_P1_turn and self.O_id == id:
             return TTTStatusCode.NotYourTurn
         #X moved during O's turn
-        if self.tictactoe.turn == 'O' and self.X_id == id:
+        if not self.tictactoe.is_P1_turn and self.X_id == id:
             return TTTStatusCode.NotYourTurn
         
         #Try to do the move and return the status code
@@ -347,7 +339,8 @@ class TicTacToeLobby:
             s += 'The game hasn\'t started yet'
             return s
 
-        s += f"{self.tictactoe.turn} to move"
+        player = TTTPlayer.P1 if self.tictactoe.is_P1_turn else TTTPlayer.P2
+        s += f"{player} to move"
         s += f'```\n{self.tictactoe}```\n'
         return s
 

@@ -10,6 +10,11 @@ from Kumiko.util import MEX,ping
 # TODO: Go over suggestions in tictactoe comments.txt and delete that file when done
 # TODO: Bug fixes obv
 
+'''
+Buglist
+- %tictactoe leave raises "Cannooot send an empty message"
+'''
+
 class TTTStatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
     Success          =  0
@@ -107,9 +112,9 @@ class TicTacToe:
         if self.get_winner() != None:
             return TTTStatusCode.GameOver
         return TTTStatusCode.Success
-    
+
+    # TODO: Delete this function and reinitialize on restart instead
     def restart(self) -> None:
-        '''Restarts the game state'''
         for r in range(3):
             for c in range(3):
                 self.board[r][c] = ' '
@@ -136,11 +141,8 @@ class TicTacToeLobby:
     Attributes
     ----------
     tictactoe : Tictactoe
-        The tic-tac-toe board.
     lobby_id : int
-        The id of this lobby.
     player_count : int
-        The number of players currently in the lobby.
     X_id : int|None
         The discord id of player X. Set to None if they don't exist.
     O_id : int|None
@@ -156,6 +158,8 @@ class TicTacToeLobby:
                  X_name:str|None=None, O_name:str|None=None):
         self.tictactoe:TicTacToe = TicTacToe()
         self.lobby_id:int = lobby_id
+        # TODO: Make this store the discord user directly
+        # https://discordpy.readthedocs.io/en/stable/ext/commands/api.html#discord.ext.commands.Context.author
         self.X_id:int|None = X_id
         self.O_id:int|None = O_id
         self.X_name:str|None = X_name

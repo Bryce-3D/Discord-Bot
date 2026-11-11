@@ -46,15 +46,10 @@ class TicTacToe:
     The returned `StatusCode`s listed in the documentation are listed in 
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
-
-    Attributes
-    ----------
-    board : list[list[str]]
-    is_P1_turn : bool
     '''
     def __init__(self):
-        self.board:list[list[str]] = [
-            [' ' for c in range(3)] for r in range(3)
+        self.board:list[list[PlayerStr|None]] = [
+            [None for c in range(3)] for r in range(3)
         ]
         self.is_P1_turn:bool = True
     
@@ -76,7 +71,6 @@ class TicTacToe:
         return False
     
     def get_winner(self) -> PlayerStr|None:
-        '''Returns the winner or `None` if neither has won'''
         if self._win_check(PlayerStr.P1):
             return PlayerStr.P1
         if self._win_check(PlayerStr.P2):
@@ -92,11 +86,11 @@ class TicTacToe:
                               AND does not end the game
             `CellOutOfRange`  if the provided coordinates are out of range
             `CellUnavailable` if the cell is not available
-            `GameOver`        if a player has won
+            `GameOver`        if a player has won or the game is a draw
         '''
         if r < 0 or r > 2 or c < 0 or c > 2:
             return StatusCode.CellOutOfRange
-        if self.board[r][c] != ' ':
+        if self.board[r][c] != None:
             return StatusCode.CellUnavailable
 
         self.board[r][c] = PlayerStr.P1 if self.is_P1_turn else PlayerStr.P2
@@ -111,18 +105,21 @@ class TicTacToe:
     def restart(self) -> None:
         for r in range(3):
             for c in range(3):
-                self.board[r][c] = ' '
-        self.filled = 0
+                self.board[r][c] = None
+        self.is_P1_turn = True
 
     def __str__(self) -> str:
-        '''Returns a string representation of the board state'''
-        b = self.board
-        s = (f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
-             '---+---+---\n'
-             f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
-             '---+---+---\n'
-             f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n')
-        return s
+        b = [
+            [' ' if cell is None else cell for cell in row]
+            for row in self.board
+        ]
+        return (
+            f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
+            '---+---+---\n'
+            f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
+            '---+---+---\n'
+            f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n'
+        )
 
 # TODO: Make an unstarted lobby have self.tictactoe = None and delete 
 #  self.is_started or make it an @property

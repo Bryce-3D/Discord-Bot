@@ -326,7 +326,7 @@ class Lobbies:
         return lobby.get_next_to_move()
 
     @staticmethod
-    def join(lobby_id:int, user:discord.User|discord.Guild) -> StatusCode:
+    def join(lobby_id:int, user:discord.User|discord.Member) -> StatusCode:
         '''
         Returns
         -------

@@ -4,6 +4,7 @@ from enum import IntEnum, StrEnum
 
 from Kumiko.bot_config import bot
 from Kumiko.util import MEX,ping
+from Kumiko.types import DiscordUser
 
 # TODO: Make lobbies tied to channels rather than using a lobby id
 # TODO: Clean out unnecesary comments
@@ -127,22 +128,22 @@ class Lobby:
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
     '''
-    def __init__(self, lobby_id:int, P1:discord.User|discord.Member|None,
-            P2:discord.User|discord.Member|None):
+    def __init__(self, lobby_id:int, P1:DiscordUser|None,
+            P2:DiscordUser|None):
         self.tictactoe:TicTacToe = TicTacToe()
         self.lobby_id:int = lobby_id
-        self.P1:discord.User|discord.Member|None = P1
-        self.P2:discord.User|discord.Member|None = P2
+        self.P1:DiscordUser|None = P1
+        self.P2:DiscordUser|None = P2
         self.is_started:bool = False
     
     @property
     def player_count(self) -> int:
         return (self.P1 is not None) + (self.P2 is not None)
 
-    def is_in(self, player:discord.User|discord.Member) -> bool:
+    def is_in(self, player:DiscordUser) -> bool:
         return self.P1 == player or self.P2 == player
 
-    def add_player(self, player:discord.User|discord.Member) -> StatusCode:
+    def add_player(self, player:DiscordUser) -> StatusCode:
         '''
         Returns
         -------
@@ -162,7 +163,7 @@ class Lobby:
             self.P2 = player
         return StatusCode.Success
     
-    def remove_player(self, player:discord.User|discord.Member) -> StatusCode:
+    def remove_player(self, player:DiscordUser) -> StatusCode:
         '''
         Removes a player and resets the game if it was started.
 
@@ -212,7 +213,7 @@ class Lobby:
         self.is_started = True
         return StatusCode.Success
     
-    def get_next_to_move(self) -> discord.User|discord.Member|None:
+    def get_next_to_move(self) -> DiscordUser|None:
         if not self.is_started:
             return None
         if self.tictactoe.is_P1_turn:
@@ -226,7 +227,7 @@ class Lobby:
         self.tictactoe.restart()
         self.is_started = False
     
-    def place(self, player:discord.User|discord.Member, r:int, c:int
+    def place(self, player:DiscordUser, r:int, c:int
             ) -> StatusCode:
         '''
         Returns
@@ -288,14 +289,14 @@ class Lobbies:
     #lobby_id_to_lobby[i] = lobby number i
     lobby_id_to_lobby:dict[int,Lobby] = {}
     #user_to_lobby_id[user] = lobby id of user
-    user_to_lobby_id:dict[discord.User|discord.Member,int] = {}
+    user_to_lobby_id:dict[DiscordUser,int] = {}
 
     @staticmethod
-    def is_in_some_lobby(user:discord.User|discord.Member) -> bool:
+    def is_in_some_lobby(user:DiscordUser) -> bool:
         return user in Lobbies.user_to_lobby_id
 
     @staticmethod
-    def lobby_create(user:discord.User|discord.Member) -> int|None:
+    def lobby_create(user:DiscordUser) -> int|None:
         '''
         Create a lobby for `user` who goes first by default.
         
@@ -313,20 +314,20 @@ class Lobbies:
         return lobby_id
 
     @staticmethod
-    def get_lobby_id(user:discord.User|discord.Member) -> int|None:
+    def get_lobby_id(user:DiscordUser) -> int|None:
         if not Lobbies.is_in_some_lobby(user):
             return None
         return Lobbies.user_to_lobby_id[user]
 
     @staticmethod
-    def get_next_to_move(lobby_id:int) -> discord.User|discord.Member|None:
+    def get_next_to_move(lobby_id:int) -> DiscordUser|None:
         if lobby_id not in Lobbies.lobby_id_to_lobby:
             return None
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
         return lobby.get_next_to_move()
 
     @staticmethod
-    def join(lobby_id:int, user:discord.User|discord.Member) -> StatusCode:
+    def join(lobby_id:int, user:DiscordUser) -> StatusCode:
         '''
         Returns
         -------
@@ -348,7 +349,7 @@ class Lobbies:
         return StatusCode.Success
 
     @staticmethod
-    def leave(user:discord.User|discord.Member) -> StatusCode:
+    def leave(user:DiscordUser) -> StatusCode:
         '''
         Lets a user leave a tic-tac-toe lobby.
 
@@ -375,7 +376,7 @@ class Lobbies:
             del Lobbies.lobby_id_to_lobby[lobby_id]
 
     @staticmethod
-    def swap(user:discord.User|discord.Member) -> StatusCode:
+    def swap(user:DiscordUser) -> StatusCode:
         '''
         Swaps P1 and P2 in the lobby of `user`
         
@@ -396,7 +397,7 @@ class Lobbies:
         return StatusCode.Success
 
     @staticmethod
-    def start(user:discord.User|discord.Member) -> StatusCode:
+    def start(user:DiscordUser) -> StatusCode:
         '''
         Returns
         -------
@@ -418,7 +419,7 @@ class Lobbies:
         return StatusCode.Success
 
     @staticmethod
-    def place(user:discord.User|discord.Member, r:int, c:int) -> StatusCode:
+    def place(user:DiscordUser, r:int, c:int) -> StatusCode:
         '''
         Lets the user place their mark on (r,c)
         
@@ -469,7 +470,7 @@ class RespMsg:
     `b` isn't even an integer in the first place.
     '''
     @staticmethod
-    def create(lobby_id:str|None, user:discord.User|discord.Member) -> str:
+    def create(lobby_id:str|None, user:DiscordUser) -> str:
         '''Generates the message to send for Lobbies.create()'''
         if lobby_id != None:
             return (f"Created a lobby with id {lobby_id} for {ping(user)}\n"
@@ -479,7 +480,7 @@ class RespMsg:
 
     @staticmethod
     def join(status_code:StatusCode, lobby_id:int,
-            user:discord.User|discord.Member) -> str|None:
+            user:DiscordUser) -> str|None:
         '''
         Generates the message to send for Lobbies.join().
 
@@ -503,7 +504,7 @@ class RespMsg:
         
     @staticmethod
     def leave(status_code:StatusCode, lobby_id:int|None, 
-            user:discord.User|discord.Member) -> str|None:
+            user:DiscordUser) -> str|None:
         '''
         Generates the message to send for Lobbies.leave().
 
@@ -522,7 +523,7 @@ class RespMsg:
         
     @staticmethod
     def swap(status_code:StatusCode, lobby_id:int|None, 
-            user:discord.User|discord.Member) -> str|None:
+            user:DiscordUser) -> str|None:
         '''
         Generates the message to send for Lobbies.swap().
 
@@ -544,7 +545,7 @@ class RespMsg:
     
     @staticmethod
     def start(status_code:StatusCode, lobby_id:int|None, 
-            user:discord.User|discord.Member) -> str|None:
+            user:DiscordUser) -> str|None:
         '''
         Generates the message to send for Lobbies.start().
 
@@ -569,7 +570,7 @@ class RespMsg:
     
     @staticmethod
     def place(status_code:StatusCode, lobby_id:int|None,
-            user:discord.Member|discord.User, row:int, col:int) -> str|None:
+            user:DiscordUser, row:int, col:int) -> str|None:
         '''
         Generates the message to send for Lobbies.place().
 
@@ -605,7 +606,7 @@ class RespMsg:
             return None
     
     @staticmethod
-    def view(user:discord.User|discord.Member) -> str:
+    def view(user:DiscordUser) -> str:
         '''Generates the message to send for Lobbies.view()'''
         if not Lobbies.is_in_some_lobby(user):
             return f"{ping(user)} you're not in any lobby"
@@ -665,7 +666,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
         raise Exception(msg)
 
     cmd = cmd.lower()
-    user:discord.User|discord.Member = ctx.author
+    user:DiscordUser = ctx.author
 
     #Usage: `%tictactoe create`
     if cmd == 'create':

@@ -40,9 +40,6 @@ class TicTacToe:
     '''
     A class to represent the state of a tic-tac-toe game.
 
-    Contains the tic-tac-toe board as well as a lot of helper functions to 
-    make it easier to use. X always goes before O in this implementation.
-
     The returned `StatusCode`s listed in the documentation are listed in 
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
@@ -54,7 +51,6 @@ class TicTacToe:
         self.is_P1_turn:bool = True
     
     def _win_check(self, player:PlayerStr) -> bool:
-        '''Checks if the specified player ('X' or 'O') has won the game'''
         #Check rows
         for r in range(3):
             if self.board[r][0] == self.board[r][1] == self.board[r][2] == player:
@@ -130,22 +126,6 @@ class Lobby:
     The returned `StatusCode`s listed in the documentation are listed in 
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
-
-    Attributes
-    ----------
-    tictactoe : Tictactoe
-    lobby_id : int
-    player_count : int
-    X_id : int|None
-        The discord id of player X. Set to None if they don't exist.
-    O_id : int|None
-        The discord id of player O. Set to None if they don't exist.
-    X_name : str|None
-        The discord name of player X. Set to None if they don't exist.
-    O_name : str|None
-        The discord name of player O. Set to None if they don't exist.
-    is_started : bool
-        True if the game has been started, False otherwise.
     '''
     def __init__(self, lobby_id:int, P1:discord.User|discord.Member|None,
             P2:discord.User|discord.Member|None):
@@ -304,11 +284,6 @@ class Lobbies:
     The returned `StatusCode`s listed in the documentation are listed in 
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
-
-    Attributes
-    ----------
-    lobby_id_to_lobby
-    user_to_lobby_id
     '''
     #lobby_id_to_lobby[i] = lobby number i
     lobby_id_to_lobby:dict[int,Lobby] = {}
@@ -338,27 +313,6 @@ class Lobbies:
         return lobby_id
 
     @staticmethod
-    def lobby_destroy(user:discord.User|discord.Member) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`    if the lobby was successfully destroyed
-            `NotInLobby` if the user is not in some lobby
-        '''
-        if not Lobbies.is_in_some_lobby(user):
-            return StatusCode.NotInLobby
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        P1, P2 = lobby.P1, lobby.P2
-        if P1 != None:
-            del Lobbies.user_to_lobby_id[P1]
-        if P2 != None:
-            del Lobbies.user_to_lobby_id[P2]
-        del Lobbies.lobby_id_to_lobby[lobby_id]
-        return StatusCode.Success
-
-    @staticmethod
     def get_lobby_id(user:discord.User|discord.Member) -> int|None:
         if not Lobbies.is_in_some_lobby(user):
             return None
@@ -374,8 +328,6 @@ class Lobbies:
     @staticmethod
     def join(lobby_id:int, user:discord.User|discord.Guild) -> StatusCode:
         '''
-        Let `user` join the lobby `lobby_id`.
-        
         Returns
         -------
         One of the following `StatusCode`s
@@ -497,14 +449,6 @@ class Lobbies:
     
     @staticmethod
     def nuke(lobby_id:int) -> None:
-        '''
-        Deletes a lobby with id lobby_id
-
-        Parameters
-        ----------
-        lobby_id : int
-            The id of the lobby to be deleted
-        '''
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
         P1, P2 = lobby.P1, lobby.P2
         if P1 != None:

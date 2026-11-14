@@ -185,7 +185,20 @@ class Lobbies:
         return Lobbies.user_to_lobby_id[user]
 
     @staticmethod
-    def lobby_create(user:DiscordUser) -> int|None:
+    def get_next_to_move(lobby_id:int) -> DiscordUser|None:
+        if lobby_id not in Lobbies.lobby_id_to_lobby:
+            return None
+        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+        if not lobby.is_started:
+            return None
+
+        if lobby.tictactoe.is_P1_turn:
+            return lobby.P1
+        else:
+            return lobby.P2
+
+    @staticmethod
+    def create(user:DiscordUser) -> int|None:
         '''
         Create a lobby for `user` who goes first by default.
         
@@ -201,19 +214,6 @@ class Lobbies:
         Lobbies.lobby_id_to_lobby[lobby_id] = lobby
         Lobbies.user_to_lobby_id[user] = lobby_id
         return lobby_id
-
-    @staticmethod
-    def get_next_to_move(lobby_id:int) -> DiscordUser|None:
-        if lobby_id not in Lobbies.lobby_id_to_lobby:
-            return None
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        if not lobby.is_started:
-            return None
-
-        if lobby.tictactoe.is_P1_turn:
-            return lobby.P1
-        else:
-            return lobby.P2
 
     @staticmethod
     def join(lobby_id:int, user:DiscordUser) -> StatusCode:
@@ -563,7 +563,7 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
 
     #Usage: `%tictactoe create`
     if cmd == 'create':
-        lobby_id = Lobbies.lobby_create(user)
+        lobby_id = Lobbies.create(user)
         msg = RespMsg.create(lobby_id, user)
         await ctx.send(msg)
         return

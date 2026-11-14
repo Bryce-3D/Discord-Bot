@@ -130,15 +130,18 @@ class Lobby:
     '''
     def __init__(self, lobby_id:int, P1:DiscordUser|None,
             P2:DiscordUser|None):
-        self.tictactoe:TicTacToe = TicTacToe()
+        self.tictactoe:TicTacToe|None = None
         self.lobby_id:int = lobby_id
         self.P1:DiscordUser|None = P1
         self.P2:DiscordUser|None = P2
-        self.is_started:bool = False
     
     @property
     def player_count(self) -> int:
         return (self.P1 is not None) + (self.P2 is not None)
+
+    @property
+    def is_started(self) -> bool:
+        return self.tictactoe is not None
 
     def is_in(self, player:DiscordUser) -> bool:
         return self.P1 == player or self.P2 == player
@@ -173,10 +176,10 @@ class Lobby:
             'Success'      if the player was removed successfully
             'NotInLobby'   if the player doesn't exist
         '''
-        if self.is_started:
-            self.reset()
         if not self.is_in(player):
             return StatusCode.NotInLobby
+        if self.is_started:
+            self.reset()
 
         if self.P1 == player:
             self.P1 = None
@@ -210,7 +213,7 @@ class Lobby:
             return StatusCode.NotFullLobby
         if self.is_started:
             return StatusCode.StartedLobby
-        self.is_started = True
+        self.tictactoe = TicTacToe()
         return StatusCode.Success
     
     def get_next_to_move(self) -> DiscordUser|None:
@@ -223,9 +226,7 @@ class Lobby:
 
     def reset(self) -> None:
         '''Resets the state of the game while keeping the players in'''
-        # TODO: Deprecate restart() and reinitialize/set to None
-        self.tictactoe.restart()
-        self.is_started = False
+        self.tictactoe = None
     
     def place(self, player:DiscordUser, r:int, c:int
             ) -> StatusCode:

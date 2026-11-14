@@ -33,9 +33,13 @@ class StatusCode(IntEnum):
     CellUnavailable  = 10
     GameOver         = 11
 
+
+
 class PlayerStr(StrEnum):
     P1 = 'X'
     P2 = 'O'
+
+
 
 class TicTacToe:
     '''
@@ -97,13 +101,6 @@ class TicTacToe:
             return StatusCode.GameOver
         # TODO: Also check for draws
         return StatusCode.Success
-
-    # TODO: Delete this function and reinitialize on restart instead
-    def restart(self) -> None:
-        for r in range(3):
-            for c in range(3):
-                self.board[r][c] = None
-        self.is_P1_turn = True
 
     def __str__(self) -> str:
         b = [

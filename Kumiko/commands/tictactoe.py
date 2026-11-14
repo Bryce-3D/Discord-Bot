@@ -18,6 +18,8 @@ Buglist
 - %tictactoe leave raises "Cannot send an empty message"
     * Now says "left lobby None" after reducing Lobby to dataclass LobbyState
 - Properly end tied games
+- %tictactoe place does not properly check whose turn it is and you can move 
+  for your opponent
 '''
 
 class StatusCode(IntEnum):

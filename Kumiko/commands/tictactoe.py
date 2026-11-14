@@ -1,4 +1,5 @@
 import discord
+from dataclasses import dataclass
 from discord.ext import commands
 from enum import IntEnum, StrEnum
 
@@ -15,6 +16,7 @@ from Kumiko.types import DiscordUser
 '''
 Buglist
 - %tictactoe leave raises "Cannot send an empty message"
+    * Now says "left lobby None" after reducing Lobby to dataclass LobbyState
 - Properly end tied games
 '''
 
@@ -107,189 +109,80 @@ class TicTacToe:
             [' ' if cell is None else cell for cell in row]
             for row in self.board
         ]
-        return (
-            f' {b[0][0]} | {b[0][1]} | {b[0][2]} \n'
-            '---+---+---\n'
-            f' {b[1][0]} | {b[1][1]} | {b[1][2]} \n'
-            '---+---+---\n'
-            f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n'
-        )
+        return '\n'.join([
+            # TODO: Edit the first line if the game is over (win/draw)
+            f'It is Player {1 if self.is_P1_turn else 2}\'s turn',
+            '```',
+            f' {b[0][0]} | {b[0][1]} | {b[0][2]} ',
+            '---+---+---',
+            f' {b[1][0]} | {b[1][1]} | {b[1][2]} ',
+            '---+---+---',
+            f' {b[2][0]} | {b[2][1]} | {b[2][2]} ',
+            '```',
+        ])
 
-class Lobby:
-    '''
-    A class to represent a tic-tac-toe game lobby.
 
-    The returned `StatusCode`s listed in the documentation are listed in 
-    the order they are checked in the implementation, with the exception 
-    of `StatusCode.Success` always being the first listed one.
-    '''
-    def __init__(self, lobby_id:int, P1:DiscordUser|None,
-            P2:DiscordUser|None):
-        self.tictactoe:TicTacToe|None = None
-        self.lobby_id:int = lobby_id
-        self.P1:DiscordUser|None = P1
-        self.P2:DiscordUser|None = P2
-    
+
+@dataclass
+class LobbyState:
+    lobby_id:int
+    P1:DiscordUser|None
+    P2:DiscordUser|None
+    tictactoe:TicTacToe|None
+
     @property
-    def player_count(self) -> int:
-        return (self.P1 is not None) + (self.P2 is not None)
+    def is_empty(self) -> bool:
+        return self.P1 is None and self.P2 is None
+
+    @property
+    def is_full(self) -> bool:
+        return self.P1 is not None and self.P2 is not None
 
     @property
     def is_started(self) -> bool:
         return self.tictactoe is not None
 
-    def is_in(self, player:DiscordUser) -> bool:
-        return self.P1 == player or self.P2 == player
-
-    def add_player(self, player:DiscordUser) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`   if the player was added successfully
-            `InLobby`   if the player is already in the lobby
-            `FullLobby` if the lobby is already full
-        '''
-        if self.is_in(player):
-            return StatusCode.InLobby
-        if self.player_count == 2:
-            return StatusCode.FullLobby
-
-        if self.P1 is None:
-            self.P1 = player
-        else:
-            self.P2 = player
-        return StatusCode.Success
-    
-    def remove_player(self, player:DiscordUser) -> StatusCode:
-        '''
-        Removes a player and resets the game if it was started.
-
-        Returns
-        -------
-        One of the following `StatusCode`s
-            'Success'      if the player was removed successfully
-            'NotInLobby'   if the player doesn't exist
-        '''
-        if not self.is_in(player):
-            return StatusCode.NotInLobby
-        if self.is_started:
-            self.reset()
-
-        if self.P1 == player:
-            self.P1 = None
-        else:
-            self.P2 = None
-        return StatusCode.Success
-
-    def swap_players(self) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`      if the swap was successful
-            `StartedLobby` if the lobby was already started
-        '''
-        if self.is_started:
-            return StatusCode.StartedLobby
-        self.P1, self.P2 = self.P2, self.P1
-        return StatusCode.Success
-
-    def start(self) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`      if the game was started successfully
-            `NotFullLobby` if the lobby was not full
-            `StartedLobby` if the lobby has already started
-        '''
-        if self.player_count != 2:
-            return StatusCode.NotFullLobby
-        if self.is_started:
-            return StatusCode.StartedLobby
-        self.tictactoe = TicTacToe()
-        return StatusCode.Success
-    
-    def get_next_to_move(self) -> DiscordUser|None:
-        if not self.is_started:
-            return None
-        if self.tictactoe.is_P1_turn:
-            return self.P1
-        else:
-            return self.P2
-
-    def reset(self) -> None:
-        '''Resets the state of the game while keeping the players in'''
-        self.tictactoe = None
-    
-    def place(self, player:DiscordUser, r:int, c:int
-            ) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`         if the move was done successfully 
-                              AND does not end the game
-            `NotInLobby`      if the user is not in the lobby
-            `UnstartedLobby`  if the game hasn't started
-            `NotYourTurn`     if it is not the player's turn
-            `CellOutOfRange`  if the provided coordinates are out of range
-            `CellUnavailable` if the spot is already filled
-            `GameOver`        if a player has won
-        '''
-        if not self.is_in(player):
-            return StatusCode.NotInLobby
-        if not self.is_started:
-            return StatusCode.UnstartedLobby
-
-        if self.tictactoe.is_P1_turn and self.P2 == player:
-            return StatusCode.NotYourTurn
-        if not self.tictactoe.is_P1_turn and self.P1 == player:
-            return StatusCode.NotYourTurn
-        
-        return self.tictactoe.place(r,c)
-
     def __str__(self) -> str:
-        s = f'Tic-tac-toe lobby {self.lobby_id}\n'
-        if self.P1 == None:
-            s += 'There is currently no Player X\n'
-        else:
-            s += f'Player 1 ({PlayerStr.P1}) is {self.P1.name}\n'
-        if self.P2 == None:
-            s += 'There is currently no Player O\n'
-        else:
-            s += f'Player 2 ({PlayerStr.P2}) is {self.P2.name}\n'
-        s += '\n'
-        
-        if not self.is_started:
-            s += 'The game hasn\'t started yet'
-            return s
+        strings = [f'Tic-tac-toe lobby {self.lobby_id}']
 
-        player_to_move = self.P1 if self.tictactoe.is_P1_turn else self.P2
-        s += f"{player_to_move.name} to move"
-        s += f'```\n{self.tictactoe}```\n'
-        return s
+        if self.P1 == None:
+            strings.append('There is no Player 1')
+        else:
+            strings.append(f'Player 1 ({PlayerStr.P1}) is {self.P1.name}')
+        if self.P2 == None:
+            strings.append('There is no Player 2')
+        else:
+            strings.append(f'Player 2 ({PlayerStr.P2}) is {self.P2.name}\n')
+
+        if not self.is_started:
+            strings.append('The game hasn\'t started yet')
+        else:
+            strings.append(str(self.tictactoe))
+
+        return '\n'.join(strings)
+
+
 
 class Lobbies:
     '''
-    A class to represent the set of all tictactoe lobbies.
-
-    This is functionally a namespace to neatly group everything relating to 
-    the set of all lobbies together.
+    Holds and manages all tictactoe game lobbies.
 
     The returned `StatusCode`s listed in the documentation are listed in 
     the order they are checked in the implementation, with the exception 
     of `StatusCode.Success` always being the first listed one.
     '''
-    #lobby_id_to_lobby[i] = lobby number i
-    lobby_id_to_lobby:dict[int,Lobby] = {}
-    #user_to_lobby_id[user] = lobby id of user
+    lobby_id_to_lobby:dict[int,LobbyState] = {}
     user_to_lobby_id:dict[DiscordUser,int] = {}
 
     @staticmethod
-    def is_in_some_lobby(user:DiscordUser) -> bool:
+    def is_in_lobby(user:DiscordUser) -> bool:
         return user in Lobbies.user_to_lobby_id
+
+    @staticmethod
+    def get_lobby_id(user:DiscordUser) -> int|None:
+        if not Lobbies.is_in_lobby(user):
+            return None
+        return Lobbies.user_to_lobby_id[user]
 
     @staticmethod
     def lobby_create(user:DiscordUser) -> int|None:
@@ -301,26 +194,26 @@ class Lobbies:
         The lobby id of the newly generated lobby or 
         `None` if the user is already in a lobby.
         '''
-        if Lobbies.is_in_some_lobby(user):
+        if Lobbies.is_in_lobby(user):
             return None
         lobby_id = MEX(Lobbies.lobby_id_to_lobby)
-        lobby = Lobby(lobby_id, P1=user, P2=None)
+        lobby = LobbyState(lobby_id=lobby_id, P1=user, P2=None, tictactoe=None)
         Lobbies.lobby_id_to_lobby[lobby_id] = lobby
         Lobbies.user_to_lobby_id[user] = lobby_id
         return lobby_id
-
-    @staticmethod
-    def get_lobby_id(user:DiscordUser) -> int|None:
-        if not Lobbies.is_in_some_lobby(user):
-            return None
-        return Lobbies.user_to_lobby_id[user]
 
     @staticmethod
     def get_next_to_move(lobby_id:int) -> DiscordUser|None:
         if lobby_id not in Lobbies.lobby_id_to_lobby:
             return None
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        return lobby.get_next_to_move()
+        if not lobby.is_started:
+            return None
+
+        if lobby.tictactoe.is_P1_turn:
+            return lobby.P1
+        else:
+            return lobby.P2
 
     @staticmethod
     def join(lobby_id:int, user:DiscordUser) -> StatusCode:
@@ -335,13 +228,18 @@ class Lobbies:
         '''
         if lobby_id not in Lobbies.lobby_id_to_lobby:
             return StatusCode.NonexistentLobby
-        if Lobbies.is_in_some_lobby(user):
+        if Lobbies.is_in_lobby(user):
             return StatusCode.InLobby
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        if lobby.player_count == 2:
+        if lobby.is_full:
             return StatusCode.FullLobby
-        lobby.add_player(user)
+
+        if lobby.P1 is None:
+            lobby.P1 = user
+        else:
+            lobby.P2 = user
         Lobbies.user_to_lobby_id[user] = lobby_id
+
         return StatusCode.Success
 
     @staticmethod
@@ -359,23 +257,26 @@ class Lobbies:
             `Success`    if the user left the lobby successfully
             `NotInLobby` if they are not in a lobby
         '''
-        if not Lobbies.is_in_some_lobby(user):
+        if not Lobbies.is_in_lobby(user):
             return StatusCode.NotInLobby
         lobby_id = Lobbies.user_to_lobby_id[user]
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
 
         if lobby.is_started:
-            lobby.reset()
-        lobby.remove_player(user)
+            lobby.tictactoe = None
+        if lobby.P1 == user:
+            lobby.P1 = None
+        else:
+            lobby.P2 = None
         del Lobbies.user_to_lobby_id[user]
-        if lobby.player_count == 0:
+        if lobby.is_empty:
             del Lobbies.lobby_id_to_lobby[lobby_id]
+
+        return StatusCode.Success
 
     @staticmethod
     def swap(user:DiscordUser) -> StatusCode:
         '''
-        Swaps P1 and P2 in the lobby of `user`
-        
         Returns
         -------
         One of the following `StatusCode`s
@@ -383,13 +284,13 @@ class Lobbies:
             `NotInLobby`   if the user is not in a lobby
             `StartedLobby` if the user is in a started lobby
         '''
-        if not Lobbies.is_in_some_lobby(user):
+        if not Lobbies.is_in_lobby(user):
             return StatusCode.NotInLobby
         lobby_id = Lobbies.user_to_lobby_id[user]
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
         if lobby.is_started:
             return StatusCode.StartedLobby
-        lobby.swap_players()
+        lobby.P1, lobby.P2 = lobby.P2, lobby.P1
         return StatusCode.Success
 
     @staticmethod
@@ -403,22 +304,20 @@ class Lobbies:
             `NotFullLobby  if the user is in a non-full lobby
             `StartedLobby` if the user is already in a started lobby
         '''
-        if not Lobbies.is_in_some_lobby(user):
+        if not Lobbies.is_in_lobby(user):
             return StatusCode.NotInLobby
         lobby_id = Lobbies.user_to_lobby_id[user]
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        if lobby.player_count != 2:
+        if not lobby.is_full:
             return StatusCode.NotFullLobby
         if lobby.is_started:
             return StatusCode.StartedLobby
-        lobby.start()
+        lobby.tictactoe = TicTacToe()
         return StatusCode.Success
 
     @staticmethod
     def place(user:DiscordUser, r:int, c:int) -> StatusCode:
         '''
-        Lets the user place their mark on (r,c)
-        
         Returns
         -------
         One of the following `StatusCode`s
@@ -431,19 +330,15 @@ class Lobbies:
             `CellUnavailable` if the spot is already filled
             `GameOver`        if a player has won
         '''
-        if not Lobbies.is_in_some_lobby(user):
+        if not Lobbies.is_in_lobby(user):
             return StatusCode.NotInLobby
         lobby_id = Lobbies.user_to_lobby_id[user]
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
 
         #Try to do the move and clean up if the game ended
-        status_code = lobby.place(user, r, c)
-        # if status_code == StatusCode.GameOver:
-        #     del Lobbies.user_to_lobby_id[lobby.P1]
-        #     del Lobbies.user_to_lobby_id[lobby.P2]
-        #     del Lobbies.lobby_id_to_lobby[lobby_id]
+        status_code = lobby.tictactoe.place(r, c)
         return status_code
-    
+
     @staticmethod
     def nuke(lobby_id:int) -> None:
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]
@@ -453,6 +348,8 @@ class Lobbies:
         if P2 != None:
             del Lobbies.user_to_lobby_id[P2]
         del Lobbies.lobby_id_to_lobby[lobby_id]
+
+
 
 class RespMsg:
     '''
@@ -604,7 +501,7 @@ class RespMsg:
     @staticmethod
     def view(user:DiscordUser) -> str:
         '''Generates the message to send for Lobbies.view()'''
-        if not Lobbies.is_in_some_lobby(user):
+        if not Lobbies.is_in_lobby(user):
             return f"{ping(user)} you're not in any lobby"
         lobby_id = Lobbies.get_lobby_id(user)
         lobby = Lobbies.lobby_id_to_lobby[lobby_id]

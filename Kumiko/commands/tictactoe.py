@@ -118,8 +118,6 @@ class TicTacToe:
             f' {b[2][0]} | {b[2][1]} | {b[2][2]} \n'
         )
 
-# TODO: Make an unstarted lobby have self.tictactoe = None and delete 
-#  self.is_started or make it an @property
 class Lobby:
     '''
     A class to represent a tic-tac-toe game lobby.

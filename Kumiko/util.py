@@ -1,6 +1,8 @@
-#File to store common utility functions for Kumiko
+'''
+File to store common utility functions for Kumiko
+'''
 
-from __future__ import annotations
+import discord
 
 def MEX(d:dict|set) -> int:
     '''Returns the MEX of a dict or set'''
@@ -9,6 +11,6 @@ def MEX(d:dict|set) -> int:
         ans += 1
     return ans
 
-def ping(user_id:int|str) -> str:
-    '''Takes in a discord id and returns a string to ping that user'''
-    return f'<@!{user_id}>'
+def ping(user:discord.User|discord.Member) -> str:
+    '''Returns a string that pings the user'''
+    return f'<@!{user.id}>'

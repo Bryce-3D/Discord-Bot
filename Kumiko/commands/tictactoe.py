@@ -24,18 +24,10 @@ Buglist
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
-    Success          =  0
-    NotInLobby       =  1
-    InLobby          =  2
-    FullLobby        =  3
-    NotFullLobby     =  4
-    StartedLobby     =  5
-    UnstartedLobby   =  6
-    NonexistentLobby =  7
-    NotYourTurn      =  8
-    CellOutOfRange   =  9
-    CellUnavailable  = 10
-    GameOver         = 11
+    Success          = 0
+    CellOutOfRange   = 1
+    CellUnavailable  = 2
+    GameOver         = 3
 
 
 

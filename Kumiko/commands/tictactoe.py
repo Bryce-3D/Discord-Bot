@@ -84,6 +84,9 @@ class TicTacToe:
 
     def place(self, r:int, c:int) -> StatusCode:
         '''Let the next player place on row `r` and column `c`'''
+        if self.get_winner() is not None:
+            raise Exception('Cannot place when the game is already over')
+
         if r < 0 or r > 2 or c < 0 or c > 2:
             return StatusCode.CellOutOfRange
         if self.board[r][c] != None:
@@ -92,7 +95,7 @@ class TicTacToe:
         self.board[r][c] = PlayerStr.P1 if self.is_P1_turn else PlayerStr.P2
         self.is_P1_turn = not self.is_P1_turn
 
-        if self.get_winner() != None:
+        if self.get_winner() is not None:
             return StatusCode.GameOverNotTied
         if self._number_of_filled_cells == 9:
             return StatusCode.GameOverTied

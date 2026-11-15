@@ -83,16 +83,7 @@ class TicTacToe:
         return None
 
     def place(self, r:int, c:int) -> StatusCode:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`         if the cell was filled successfully
-                              AND does not end the game
-            `CellOutOfRange`  if the provided coordinates are out of range
-            `CellUnavailable` if the cell is not available
-            `GameOver`        if a player has won or the game is a draw
-        '''
+        '''Let the next player place on row `r` and column `c`'''
         if r < 0 or r > 2 or c < 0 or c > 2:
             return StatusCode.CellOutOfRange
         if self.board[r][c] != None:

@@ -24,10 +24,11 @@ Buglist
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
-    Success          = 0
-    CellOutOfRange   = 1
-    CellUnavailable  = 2
-    GameOver         = 3
+    Success         = 0
+    CellOutOfRange  = 1
+    CellUnavailable = 2
+    GameOverNotTied = 3
+    GameOverTied    = 4
 
 
 
@@ -50,6 +51,13 @@ class TicTacToe:
             [None for c in range(3)] for r in range(3)
         ]
         self.is_P1_turn:bool = True
+
+    @property
+    def _number_of_filled_cells(self):
+        return sum([
+            sum([cell is not None for cell in row])
+            for row in self.board
+        ])
     
     def _win_check(self, player:PlayerStr) -> bool:
         #Check rows
@@ -94,8 +102,9 @@ class TicTacToe:
         self.is_P1_turn = not self.is_P1_turn
 
         if self.get_winner() != None:
-            return StatusCode.GameOver
-        # TODO: Also check for draws
+            return StatusCode.GameOverNotTied
+        if self._number_of_filled_cells == 9:
+            return StatusCode.GameOverTied
         return StatusCode.Success
 
     def __str__(self) -> str:
@@ -310,11 +319,20 @@ class Lobbies:
         if status_code == StatusCode.CellUnavailable:
             return f"{ping(user)} ({r},{c}) is already marked"
 
-        if status_code == StatusCode.GameOver:
+        if status_code == StatusCode.GameOverNotTied:
             Lobbies._nuke(lobby_id)
             return '\n'.join([
                 "**Game over**",
                 f"{ping(user)} won!",
+                "",
+                f"{lobby}",
+            ])
+
+        if status_code == StatusCode.GameOverTied:
+            Lobbies._nuke(lobby_id)
+            return '\n'.join([
+                "**Game over**",
+                "Draw",
                 "",
                 f"{lobby}",
             ])

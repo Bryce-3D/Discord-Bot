@@ -358,10 +358,6 @@ class Lobbies:
 
 
 
-#TODO
-#Make the debug message also log in my personal server for easy access
-#inside stop().
-
 @bot.command()
 async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     '''

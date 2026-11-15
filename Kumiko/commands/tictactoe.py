@@ -300,7 +300,6 @@ class Lobbies:
 
     @staticmethod
     def place(user:DiscordUser, r:int, c:int) -> str:
-        # TODO: Handle draws properly
         if not Lobbies._is_in_lobby(user):
             return f"{ping(user)} you're not in any lobby"
 

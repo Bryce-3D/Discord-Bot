@@ -99,13 +99,21 @@ class TicTacToe:
         return StatusCode.Success
 
     def __str__(self) -> str:
+        winner = self.get_winner()
+        if winner is not None:
+            header = f'Player {1 if winner == PlayerStr.P1 else 2} wins'
+        elif self._number_of_filled_cells == 9:
+            header = 'Game tied'
+        else:
+            header = f'It is Player {1 if self.is_P1_turn else 2}\'s turn'
+
         b = [
             [' ' if cell is None else cell for cell in row]
             for row in self.board
         ]
+
         return '\n'.join([
-            # TODO: Edit the first line if the game is over (win/draw)
-            f'It is Player {1 if self.is_P1_turn else 2}\'s turn',
+            header,
             '```',
             f' {b[0][0]} | {b[0][1]} | {b[0][2]} ',
             '---+---+---',
@@ -322,7 +330,6 @@ class Lobbies:
             Lobbies._nuke(lobby_id)
             return '\n'.join([
                 "**Game over**",
-                "Draw",
                 "",
                 f"{lobby}",
             ])

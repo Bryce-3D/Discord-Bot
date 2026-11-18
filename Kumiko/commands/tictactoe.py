@@ -13,11 +13,11 @@ from Kumiko.types import DiscordUser
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
-    Success         = 0
-    CellOutOfRange  = 1
-    CellUnavailable = 2
-    GameOverNotTied = 3
-    GameOverTied    = 4
+    SuccessAndNotGameOver = 0
+    CellOutOfRange        = 1
+    CellUnavailable       = 2
+    GameOverNotTied       = 3
+    GameOverTied          = 4
 
 
 
@@ -88,7 +88,7 @@ class TicTacToe:
             return StatusCode.GameOverNotTied
         if self._number_of_filled_cells == 9:
             return StatusCode.GameOverTied
-        return StatusCode.Success
+        return StatusCode.SuccessAndNotGameOver
 
     def __str__(self) -> str:
         winner = self.get_winner()
@@ -326,7 +326,7 @@ class Lobbies:
                 f"{lobby}",
             ])
         
-        if status_code == StatusCode.Success:
+        if status_code == StatusCode.SuccessAndNotGameOver:
             next_to_move = lobby.get_player_to_move()
             return '\n'.join([
                 f"{ping(current_to_move)} marked ({row},{col})",

@@ -8,8 +8,6 @@ from Kumiko.util import MEX,ping
 from Kumiko.types import DiscordUser
 
 # TODO: Make lobbies tied to channels rather than using a lobby id
-# TODO: Raise exceptions instead of returning status codes (?)
-
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''

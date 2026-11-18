@@ -2,10 +2,7 @@
 File to store common utility functions for Kumiko
 '''
 
-import discord
-from discord.abc import Snowflake
-
-from Kumiko.types import DiscordUser
+from Kumiko.types import DiscordChannel, DiscordUser
 
 def MEX(d:dict|set) -> int:
     '''Returns the MEX of a dict or set'''
@@ -18,6 +15,6 @@ def ping(user:DiscordUser) -> str:
     '''Returns a string that pings the user'''
     return f'<@!{user.id}>'
 
-def channel_str(channel:Snowflake) -> str:
+def channel_str(channel:DiscordChannel) -> str:
     '''Returns a string linking to the given channel'''
     return f'<#{channel.id}>'

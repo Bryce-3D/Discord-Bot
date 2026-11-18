@@ -82,17 +82,17 @@ class TicTacToe:
             return PlayerStr.P2
         return None
 
-    def place(self, r:int, c:int) -> StatusCode:
+    def place(self, row:int, col:int) -> StatusCode:
         '''Let the next player place on row `r` and column `c`'''
         if self.get_winner() is not None:
             raise Exception('Cannot place when the game is already over')
 
-        if r < 0 or r > 2 or c < 0 or c > 2:
+        if row < 0 or row > 2 or col < 0 or col > 2:
             return StatusCode.CellOutOfRange
-        if self.board[r][c] != None:
+        if self.board[row][col] != None:
             return StatusCode.CellUnavailable
 
-        self.board[r][c] = PlayerStr.P1 if self.is_P1_turn else PlayerStr.P2
+        self.board[row][col] = PlayerStr.P1 if self.is_P1_turn else PlayerStr.P2
         self.is_P1_turn = not self.is_P1_turn
 
         if self.get_winner() is not None:
@@ -110,7 +110,7 @@ class TicTacToe:
         else:
             header = f'It is Player {1 if self.is_P1_turn else 2}\'s turn'
 
-        b = [
+        board_str = [
             [' ' if cell is None else cell for cell in row]
             for row in self.board
         ]
@@ -118,11 +118,11 @@ class TicTacToe:
         return '\n'.join([
             header,
             '```',
-            f' {b[0][0]} | {b[0][1]} | {b[0][2]} ',
+            f' {board_str[0][0]} | {board_str[0][1]} | {board_str[0][2]} ',
             '---+---+---',
-            f' {b[1][0]} | {b[1][1]} | {b[1][2]} ',
+            f' {board_str[1][0]} | {board_str[1][1]} | {board_str[1][2]} ',
             '---+---+---',
-            f' {b[2][0]} | {b[2][1]} | {b[2][2]} ',
+            f' {board_str[2][0]} | {board_str[2][1]} | {board_str[2][2]} ',
             '```',
         ])
 
@@ -301,7 +301,7 @@ class Lobbies:
         )
 
     @staticmethod
-    def place(user:DiscordUser, r:int, c:int) -> str:
+    def place(user:DiscordUser, row:int, col:int) -> str:
         if not Lobbies._is_in_lobby(user):
             return f"{ping(user)} you're not in any lobby"
 
@@ -314,11 +314,11 @@ class Lobbies:
         if user != current_to_move:
             return f"{ping(user)} it's not your turn"
 
-        status_code = lobby.tictactoe.place(r, c)
+        status_code = lobby.tictactoe.place(row, col)
         if status_code == StatusCode.CellOutOfRange:
             return f"{ping(user)} that is not inside the board"
         if status_code == StatusCode.CellUnavailable:
-            return f"{ping(user)} ({r},{c}) is already marked"
+            return f"{ping(user)} ({row},{col}) is already marked"
 
         if status_code == StatusCode.GameOverNotTied:
             Lobbies._nuke(lobby_id)
@@ -340,7 +340,7 @@ class Lobbies:
         if status_code == StatusCode.Success:
             next_to_move = lobby.get_player_to_move()
             return '\n'.join([
-                f"{ping(current_to_move)} marked ({r},{c})",
+                f"{ping(current_to_move)} marked ({row},{col})",
                 f"{ping(next_to_move)}'s turn to move",
                 f"{lobby}",
             ])

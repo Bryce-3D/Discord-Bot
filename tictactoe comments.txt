@@ -1,6 +1,3 @@
-* variable names (especially parameters) in general 👁️
-* using __str__ for not necessarily the object as a string ? questionable choice
- - just define methods for `[thing]_to_string()`, its clearer
 * recommend using cogs, but if you want to hook commands directly into bot that's fine too
  - my command groups kinda polluting namespace with its function names, could go `_create` etc and rename it
    though, up to you for that

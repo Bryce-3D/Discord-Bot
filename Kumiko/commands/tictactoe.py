@@ -8,19 +8,8 @@ from Kumiko.util import MEX,ping
 from Kumiko.types import DiscordUser
 
 # TODO: Make lobbies tied to channels rather than using a lobby id
-# TODO: Clean out unnecesary comments
-# TODO: Go over suggestions in tictactoe comments.txt and delete that file when done
-# TODO: Bug fixes obv
 # TODO: Raise exceptions instead of returning status codes (?)
 
-'''
-Buglist
-- %tictactoe leave raises "Cannot send an empty message"
-    * Now says "left lobby None" after reducing Lobby to dataclass LobbyState
-- Properly end tied games
-- %tictactoe place does not properly check whose turn it is and you can move 
-  for your opponent
-'''
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''

@@ -6,7 +6,7 @@ from Kumiko.bot_config import bot
 from Kumiko.util import channel_str, ping
 from Kumiko.types import DiscordChannel, DiscordUser
 
-# TODO: Make lobbies tied to channels rather than using a lobby id
+
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''

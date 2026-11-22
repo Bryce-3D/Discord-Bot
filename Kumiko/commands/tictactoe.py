@@ -1,13 +1,12 @@
-import discord
 from dataclasses import dataclass
 from discord.ext import commands
 from enum import IntEnum, StrEnum
 
 from Kumiko.bot_config import bot
-from Kumiko.util import MEX,ping
-from Kumiko.types import DiscordUser
+from Kumiko.util import channel_str, ping
+from Kumiko.types import DiscordChannel, DiscordUser
 
-# TODO: Make lobbies tied to channels rather than using a lobby id
+
 
 class StatusCode(IntEnum):
     '''Status Codes used to manage Tic-Tac-Toe'''
@@ -117,7 +116,7 @@ class TicTacToe:
 
 @dataclass
 class LobbyState:
-    lobby_id:int
+    channel:DiscordChannel
     P1:DiscordUser|None
     P2:DiscordUser|None
     tictactoe:TicTacToe|None
@@ -134,13 +133,16 @@ class LobbyState:
     def is_started(self) -> bool:
         return self.tictactoe is not None
 
+    def is_in(self, user:DiscordUser) -> bool:
+        return self.P1 == user or self.P2 == user
+
     def get_player_to_move(self) -> DiscordUser|None:
         if not self.is_started:
             return None
         return self.P1 if self.tictactoe.is_P1_turn else self.P2
 
     def __str__(self) -> str:
-        strings = [f'Tic-tac-toe lobby {self.lobby_id}']
+        strings = [f'Tic-tac-toe lobby in {channel_str(self.channel)}']
 
         if self.P1 == None:
             strings.append('There is no Player 1')
@@ -169,133 +171,111 @@ class Lobbies:
     # TODO: Abstract out common responses such as "you're not in a lobby"
     # out into a class attribute or something similar
 
-    lobby_id_to_lobby:dict[int,LobbyState] = {}
-    user_to_lobby_id:dict[DiscordUser,int] = {}
+    channel_to_lobby:dict[DiscordChannel,LobbyState] = {}
 
     @staticmethod
-    def _is_in_lobby(user:DiscordUser) -> bool:
-        return user in Lobbies.user_to_lobby_id
+    def _is_in_lobby(channel:DiscordChannel, user:DiscordUser) -> bool:
+        if channel not in Lobbies.channel_to_lobby:
+            return False
+        lobby = Lobbies.channel_to_lobby[channel]
+        return lobby.is_in(user)
 
     @staticmethod
-    def _nuke(lobby_id:int) -> None:
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
-        P1, P2 = lobby.P1, lobby.P2
-        if P1 != None:
-            del Lobbies.user_to_lobby_id[P1]
-        if P2 != None:
-            del Lobbies.user_to_lobby_id[P2]
-        del Lobbies.lobby_id_to_lobby[lobby_id]
-
-    @staticmethod
-    def create(user:DiscordUser) -> str:
-        '''Create a lobby for `user` who goes first by default.'''
-        if Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're already in a lobby"
-
-        lobby_id = MEX(Lobbies.lobby_id_to_lobby)
-        lobby = LobbyState(lobby_id=lobby_id, P1=user, P2=None, tictactoe=None)
-        Lobbies.lobby_id_to_lobby[lobby_id] = lobby
-        Lobbies.user_to_lobby_id[user] = lobby_id
-
-        return (
-            f"Created a lobby with id {lobby_id} for {ping(user)}\n"
-            f"Use `%tictactoe join {lobby_id}` to join"
+    def _init_lobby(channel:DiscordChannel) -> LobbyState:
+        '''Does all the setup associated with making a lobby'''
+        lobby = LobbyState(
+            channel=channel,
+            P1=None,
+            P2=None,
+            tictactoe=None,
         )
+        Lobbies.channel_to_lobby[channel] = lobby
+        return lobby
 
     @staticmethod
-    def join(lobby_id:int, user:DiscordUser) -> str:
-        if Lobbies._is_in_lobby(user):
-            return (
-                f"{ping(user)} you're already in a lobby\n"
-                "Please leave first if you want to join another lobby"
-            )
-        if lobby_id not in Lobbies.lobby_id_to_lobby:
-            return f"{ping(user)} no lobbies with the id {lobby_id} exist"
+    def _nuke(channel:DiscordChannel) -> None:
+        '''Does all the cleanup associated with nuking a lobby'''
+        if channel not in Lobbies.channel_to_lobby:
+            return
+        del Lobbies.channel_to_lobby[channel]
 
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+    @staticmethod
+    def join(channel:DiscordChannel, user:DiscordUser) -> str:
+        if Lobbies._is_in_lobby(channel, user):
+            return f"{ping(user)} you're already in this lobby"
+
+        if channel not in Lobbies.channel_to_lobby:
+            lobby = Lobbies._init_lobby(channel)
+        else:
+            lobby = Lobbies.channel_to_lobby[channel]
+
         if lobby.is_full:
-            return f"{ping(user)} sorry lobby {lobby_id} is already full"
+            return f"Sorry {ping(user)}, the lobby in {channel_str(channel)} is already full"
 
         if lobby.P1 is None:
             lobby.P1 = user
         else:
             lobby.P2 = user
-        Lobbies.user_to_lobby_id[user] = lobby_id
-
-        return f"{ping(user)} successfully joined lobby {lobby_id}"
+        return f"{ping(user)} joined the lobby in {channel_str(channel)}"
 
     @staticmethod
-    def leave(user:DiscordUser) -> str:
+    def leave(channel:DiscordChannel, user:DiscordUser) -> str:
         '''
         Lets a user leave a tic-tac-toe lobby.
 
         If the lobby was a started game, also resets the game.
         If the lobby is empty after the player leaves, also deletes the lobby.
         '''
-        if not Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're not in any lobby"
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+        if not Lobbies._is_in_lobby(channel, user):
+            return f"{ping(user)} you're not in the lobby for {channel_str(channel)}"
+        lobby = Lobbies.channel_to_lobby[channel]
 
-        if lobby.is_started:
-            lobby.tictactoe = None
         if lobby.P1 == user:
             lobby.P1 = None
         else:
             lobby.P2 = None
-        del Lobbies.user_to_lobby_id[user]
+        if lobby.is_started:
+            lobby.tictactoe = None
         if lobby.is_empty:
-            del Lobbies.lobby_id_to_lobby[lobby_id]
+            Lobbies._nuke(channel)
 
-        return f"{ping(user)} has left lobby {lobby_id}"
+        return f"{ping(user)} has left the lobby in {channel_str(channel)}"
 
     @staticmethod
-    def swap(user:DiscordUser) -> str:
-        '''Swap Players 1 and 2 in `user`'s lobby'''
-        if not Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're not in any lobby"
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+    def swap(channel:DiscordChannel, user:DiscordUser) -> str:
+        '''Swap Players 1 and 2'''
+        if not Lobbies._is_in_lobby(channel, user):
+            return f"{ping(user)} you're not in the lobby in {channel_str(channel)}"
+        lobby = Lobbies.channel_to_lobby[channel]
         if lobby.is_started:
             return f"{ping(user)} you can't swap once the game has started"
         lobby.P1, lobby.P2 = lobby.P2, lobby.P1
-        return f"{ping(user)} successfully swapped players in lobby {lobby_id}"
+        return f"{ping(user)} successfully swapped players in the lobby"
 
     @staticmethod
-    def start(user:DiscordUser) -> str:
-        '''
-        Returns
-        -------
-        One of the following `StatusCode`s
-            `Success`      if the game was started successfully
-            `NotInLobby`   if the user is not in a lobby
-            `NotFullLobby  if the user is in a non-full lobby
-            `StartedLobby` if the user is already in a started lobby
-        '''
-        if not Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're not in any lobby"
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+    def start(channel:DiscordChannel, user:DiscordUser) -> str:
+        if not Lobbies._is_in_lobby(channel, user):
+            return f"{ping(user)} you're not in the lobby in {channel_str(channel)}"
+        lobby = Lobbies.channel_to_lobby[channel]
         if not lobby.is_full:
-            return f"{ping(user)} your lobby isn't full yet"
+            return f"{ping(user)} the lobby isn't full yet"
         if lobby.is_started:
-            return f"{ping(user)} your lobby has already started"
+            return f"{ping(user)} the lobby has already started"
 
         lobby.tictactoe = TicTacToe()
         return (
-            f"{ping(user)} started lobby {lobby_id}\n"
+            f"{ping(user)} started the lobby in {channel_str(channel)}\n"
             f"{ping(lobby.P1)} goes first"
         )
 
     @staticmethod
-    def place(user:DiscordUser, row:int, col:int) -> str:
-        if not Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're not in any lobby"
+    def place(channel:DiscordChannel, user:DiscordUser, row:int, col:int) -> str:
+        if not Lobbies._is_in_lobby(channel, user):
+            return f"{ping(user)} you're not in the lobby in {channel_str(channel)}"
 
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+        lobby = Lobbies.channel_to_lobby[channel]
         if not lobby.is_started:
-            return f"{ping(user)} your lobby hasn't started yet"
+            return f"{ping(user)} the lobby hasn't started yet"
 
         current_to_move = lobby.get_player_to_move()
         if user != current_to_move:
@@ -308,7 +288,7 @@ class Lobbies:
             return f"{ping(user)} ({row},{col}) is already marked"
 
         if status_code == StatusCode.GameOverNotTied:
-            Lobbies._nuke(lobby_id)
+            Lobbies._nuke(channel)
             return '\n'.join([
                 "**Game over**",
                 f"{ping(user)} won!",
@@ -317,7 +297,7 @@ class Lobbies:
             ])
 
         if status_code == StatusCode.GameOverTied:
-            Lobbies._nuke(lobby_id)
+            Lobbies._nuke(channel)
             return '\n'.join([
                 "**Game over**",
                 "",
@@ -335,12 +315,10 @@ class Lobbies:
         raise Exception(f'Unexpected status code received: {status_code}')
 
     @staticmethod
-    def view(user:DiscordUser) -> str:
-        '''Let a user view their lobby'''
-        if not Lobbies._is_in_lobby(user):
-            return f"{ping(user)} you're not in any lobby"
-        lobby_id = Lobbies.user_to_lobby_id[user]
-        lobby = Lobbies.lobby_id_to_lobby[lobby_id]
+    def view(channel:DiscordChannel) -> str:
+        if channel not in Lobbies.channel_to_lobby:
+            return f"There is currently no lobby in {channel_str(channel)}"
+        lobby = Lobbies.channel_to_lobby[channel]
         return str(lobby)
 
 
@@ -359,64 +337,35 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     Arguments
     ---------
     cmd : str
-        The command being invoked. This is not case sensitive. 
-        The inputted command must be one of
-            create
-            join
-            leave
-            swap
-            start
-            place
-            view
+        The sub-command being invoked. This is not case sensitive.
     *args : str
         The arguments passed to the given sub-command
     '''
     cmd = cmd.lower()
     user:DiscordUser = ctx.author
-
-    #Usage: `%tictactoe create`
-    if cmd == 'create':
-        msg = Lobbies.create(user)
-        await ctx.send(msg)
-        return
+    channel:DiscordChannel = ctx.channel
     
-    #Usage: `%tictactoe join lobby_id`
-    elif cmd == 'join':
-        #Lacking arguments
-        if len(args) < 1:
-            await ctx.send(
-                "Please put a lobby id to join\n"
-                "Sample usage: `%tictactoe join 21`"
-            )
-            return
-        #Non-integer lobby id
-        lobby_id = args[0]
-        if not lobby_id.isdigit():
-            await ctx.send(
-                f"{lobby_id} is not a valid lobby id, please use the digits only"
-            )
-            return
-        
-        lobby_id = int(lobby_id)
-        msg = Lobbies.join(lobby_id, user)
+    #Usage: `%tictactoe join`
+    if cmd == 'join':
+        msg = Lobbies.join(channel, user)
         await ctx.send(msg)
         return
 
     #Usage: `%tictactoe leave`
     elif cmd == 'leave':
-        msg = Lobbies.leave(user)
+        msg = Lobbies.leave(channel, user)
         await ctx.send(msg)
         return
 
     #Usage: `%tictactoe swap`
     elif cmd == 'swap':
-        msg = Lobbies.swap(user)
+        msg = Lobbies.swap(channel, user)
         await ctx.send(msg)
         return
 
     #Usage: `%tictactoe start`
     elif cmd == 'start':
-        msg = Lobbies.start(user)
+        msg = Lobbies.start(channel, user)
         await ctx.send(msg)
         return
 
@@ -424,35 +373,25 @@ async def tictactoe(ctx:commands.Context, cmd:str, *args:str) -> None:
     elif cmd == 'place':
         #Lacking arguments
         if len(args) < 2:
-            await ctx.send(
-                "Please put what row and column you want to place in\n"
-                "Sample usage: `%tictactoe place 0 1"
-            )
+            await ctx.send("Please put the row and column you want to place in")
             return
         #Non-integer row or col
         row,col = args[0],args[1]
         if not (row.isdigit() and col.isdigit()):
-            await ctx.send(
-                f"At least one of {row}, {col} is not an integer, "
-                "please use integers from 0 to 2 only\n"
-                "Sample usage: `%tictactoe place 0 1"
-            )
+            await ctx.send(f"At least one of {row=}, {col=} is not an integer")
             return
 
         row,col = int(row),int(col)
-        msg = Lobbies.place(user, row, col)
+        msg = Lobbies.place(channel, user, row, col)
         await ctx.send(msg)
         return
 
     #Usage: `%tictactoe view`
     elif cmd == 'view':
-        msg = Lobbies.view(user)
+        msg = Lobbies.view(channel)
         await ctx.send(msg)
         return
     
     #Invalid tic-tac-toe subcommand given
     else:
-        await ctx.send(
-            f"{cmd} is not a valid tictactoe subcommand\n"
-            f"Please use %help for more info"
-        )
+        await ctx.send(f"{cmd} is not a valid tictactoe subcommand\n")

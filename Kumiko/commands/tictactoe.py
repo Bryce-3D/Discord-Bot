@@ -1,10 +1,9 @@
-import discord
 from dataclasses import dataclass
 from discord.ext import commands
 from enum import IntEnum, StrEnum
 
 from Kumiko.bot_config import bot
-from Kumiko.util import channel_str, MEX, ping
+from Kumiko.util import channel_str, ping
 from Kumiko.types import DiscordChannel, DiscordUser
 
 # TODO: Make lobbies tied to channels rather than using a lobby id
